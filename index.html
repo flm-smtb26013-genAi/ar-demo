@@ -23,55 +23,54 @@
 		vr-mode-ui="enabled: false"
 		device-orientation-permission-ui="enabled: false">
 
-		<a-assets>
-			<img id="site-icon" src="./top.png" />
-		</a-assets>
-
 		<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
 		<!-- ターゲット認識用コンテナ -->
 		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
 			
 			<!-- シネマティック演出グループ -->
-			<a-entity id="cinematic-root" visible="false" scale="0.1 0.1 0.1"
-				animation__scale="property: scale; from: 0.1 0.1 0.1; to: 1 1 1; dur: 2000; easing: easeOutExpo; startEvents: playAnimation;"
-				animation__float="property: position; from: 0 0 0.1; to: 0 0.15 0.2; dir: alternate; loop: true; dur: 4000; easing: easeInOutSine; startEvents: playAnimation;">
+			<a-entity id="cinematic-root" visible="false" scale="1 1 1">
 
-				<!-- ① ホームページのブルーを意識した背景パネル -->
-				<a-plane 
-					width="1.8" height="0.9" position="0 0 0" 
-					material="shader: flat; color: #1a365d; opacity: 0.85; transparent: true;"
-					animation__fade="property: material.opacity; from: 0; to: 0.85; dur: 1000; startEvents: playAnimation;">
-				</a-plane>
-
-				<!-- ② メインのロゴ画像（top.png） -->
+				<!-- ① 飛行機の軌跡（左下から右上へ伸びるライン） -->
 				<a-plane
-					src="#site-icon"
-					transparent="true"
-					width="1.5"
-					height="0.3"
-					position="0 0.2 0.02"
-					material="shader: flat; opacity: 0;"
-					animation__appear="property: material.opacity; from: 0; to: 1; dur: 1200; delay: 300; startEvents: playAnimation;">
+					id="flight-path"
+					width="0" height="0.012" 
+					position="-0.4 -0.3 0" 
+					rotation="0 0 30"
+					material="shader: flat; color: #1a365d; opacity: 0.5; transparent: true;"
+					animation__path="property: width; from: 0; to: 1.6; dur: 1500; easing: easeOutExpo; startEvents: playAnimation;">
 				</a-plane>
 
-				<!-- ③ スローガン：「Discover the extraordinary」を確実に表示するサブパネル/テキスト -->
+				<!-- ② 本格的な飛行機モデル（胴体、主翼、尾翼を組み合わせた立体構造） -->
+				<a-entity id="airplane-model"
+					position="-0.7 -0.4 0.02"
+					rotation="0 0 30"
+					animation__fly="property: position; from: -0.7 -0.4 0.02; to: 0.7 0.35 0.05; dur: 2000; easing: easeOutCubic; startEvents: playAnimation;"
+					animation__scale="property: scale; from: 0.6 0.6 0.6; to: 1.1 1.1 1.1; dur: 2000; easing: easeOutExpo; startEvents: playAnimation;">
+
+					<!-- 胴体 (Fuselage) -->
+					<a-box width="0.4" height="0.08" depth="0.08" position="0 0 0" material="shader: flat; color: #1a365d;"></a-box>
+					<!-- 機首（ノーズ） -->
+					<a-cone radius-bottom="0.04" height="0.12" position="0.22 0 0" rotation="0 0 -90" material="shader: flat; color: #1a365d;"></a-cone>
+					<!-- 主翼 (Main Wings) -->
+					<a-box width="0.12" height="0.015" depth="0.55" position="0.02 0 0" material="shader: flat; color: #1a365d;"></a-box>
+					<!-- 尾翼・垂直尾翼 (Tail Fin) -->
+					<a-box width="0.08" height="0.08" depth="0.015" position="-0.18 0.05 0" rotation="0 0 -30" material="shader: flat; color: #1a365d;"></a-box>
+					<!-- 水平尾翼 (Horizontal Stabilizer) -->
+					<a-box width="0.08" height="0.012" depth="0.22" position="-0.18 0 0" material="shader: flat; color: #1a365d;"></a-box>
+
+				</a-entity>
+
+				<!-- ③ スローガン（飛行機が飛び去った後に浮かび上がる） -->
 				<a-text
 					value="Discover the extraordinary"
 					align="center"
-					color="#ffffff"
+					color="#1a365d"
 					width="2.2"
-					position="0 -0.15 0.02"
+					position="0 -0.2 0.02"
 					material="shader: flat; opacity: 0;"
-					animation__text="property: text.opacity; from: 0; to: 1; dur: 1200; delay: 600; startEvents: playAnimation;">
+					animation__text="property: text.opacity; from: 0; to: 1; dur: 1200; delay: 1200; startEvents: playAnimation;">
 				</a-text>
-
-				<!-- ④ スタイリッシュな下部の光のライン -->
-				<a-plane
-					width="0" height="0.015" position="0 -0.3 0.02"
-					material="shader: flat; color: #ffffff;"
-					animation__line="property: width; from: 0; to: 1.4; dur: 1500; delay: 900; easing: easeOutExpo; startEvents: playAnimation;">
-				</a-plane>
 
 			</a-entity>
 		</a-entity>
@@ -83,9 +82,8 @@
 			const cinematicRoot = document.querySelector("#cinematic-root");
 
 			targetEntity.addEventListener("targetFound", event => {
-				console.log("シネマティック演出スタート");
+				console.log("本格フライト演出スタート");
 				cinematicRoot.setAttribute("visible", "true");
-				cinematicRoot.setAttribute("scale", "0.1 0.1 0.1");
 				
 				setTimeout(() => {
 					cinematicRoot.emit("playAnimation");
