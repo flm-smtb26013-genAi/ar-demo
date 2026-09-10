@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<!-- A-Frame v1.5.0 -->
 	<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 	<!-- MindAR for A-Frame v1.2.5 -->
@@ -31,11 +31,11 @@
 			display: block;
 		}
 
-		/* 空間を包み込む光のグラデーション背景オーバーレイ */
+		/* 空間を包み込む光のグラデーション背景 */
 		.space-atmosphere {
 			position: absolute;
 			inset: 0;
-			background: radial-gradient(circle at 50% 50%, rgba(30, 58, 115, 0.5) 0%, rgba(5, 11, 20, 0.9) 85%);
+			background: radial-gradient(circle at 50% 40%, rgba(30, 60, 130, 0.55) 0%, rgba(5, 11, 20, 0.92) 85%);
 			opacity: 0;
 			transition: opacity 1.5s ease;
 		}
@@ -48,16 +48,16 @@
 			height: 100%;
 		}
 
-		/* 巨大な飛行機雲の軌跡 */
+		/* 飛行機雲の軌跡 */
 		.contrail {
 			fill: none;
 			stroke: #a5c4ff;
-			stroke-width: 4px;
+			stroke-width: 3.5px;
 			stroke-linecap: round;
 			stroke-dasharray: 2500;
 			stroke-dashoffset: 2500;
 			opacity: 0;
-			filter: drop-shadow(0 0 12px rgba(135, 206, 250, 0.9));
+			filter: drop-shadow(0 0 10px rgba(135, 206, 250, 0.9));
 		}
 
 		.plane-group {
@@ -65,48 +65,47 @@
 		}
 
 		.is-animating .contrail {
-			animation: drawContrail 3.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+			animation: drawContrail 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 		}
 
 		.is-animating .plane-group {
-			animation: flyPlane 3.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+			animation: flyPlane 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 		}
 
-		/* 巨大機体デザイン */
+		/* スマホ画面に合わせた飛行機シルエットサイズ */
 		.plane-icon {
 			fill: #ffffff;
-			filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.95));
+			filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.95));
 		}
 
-		/* 世界のモニュメント・観光地シルエット群の流れゆくアニメーション */
+		/* スマホの画面幅・サイズ感に合わせて調整したモニュメント群 */
 		.monument-item {
 			position: absolute;
-			bottom: 12vh;
+			bottom: 18vh;
 			left: -200px;
-			fill: rgba(165, 196, 255, 0.85);
-			filter: drop-shadow(0 0 10px rgba(30, 144, 255, 0.6));
+			fill: rgba(200, 220, 255, 0.95);
+			filter: drop-shadow(0 0 10px rgba(100, 160, 255, 0.8));
 			opacity: 0;
 			width: 110px;
 			height: 110px;
-			transform: scale(0.6);
-			animation: panMonuments 3.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+			animation: panMonuments 3.8s linear forwards;
 		}
 
 		/* 星屑・光の粒子エフェクト */
 		.stardust {
 			position: absolute;
-			width: 6px;
-			height: 6px;
+			width: 5px;
+			height: 5px;
 			background: #ffffff;
 			border-radius: 50%;
-			box-shadow: 0 0 10px #ffffff, 0 0 20px #70a1ff;
+			box-shadow: 0 0 8px #ffffff, 0 0 16px #70a1ff;
 			opacity: 0;
 			pointer-events: none;
 			animation: twinkleStar 2s ease-in-out forwards;
 		}
 
 		@keyframes flyPlane {
-			0% { offset-distance: 0%; opacity: 0; transform: scale(1.5); }
+			0% { offset-distance: 0%; opacity: 0; transform: scale(1.2); }
 			10% { opacity: 1; }
 			90% { opacity: 1; }
 			100% { offset-distance: 100%; opacity: 0; }
@@ -123,27 +122,27 @@
 			0% {
 				left: -150px;
 				opacity: 0;
-				transform: translateY(30px) scale(0.7);
+				transform: scale(0.85);
 			}
-			20% {
-				opacity: 0.9;
-				transform: translateY(0px) scale(1);
+			15% {
+				opacity: 1;
+				transform: scale(1);
 			}
-			80% {
-				opacity: 0.9;
-				transform: translateY(-10px) scale(1.05);
+			85% {
+				opacity: 1;
+				transform: scale(1);
 			}
 			100% {
 				left: 105vw;
 				opacity: 0;
-				transform: translateY(-20px) scale(1.1);
+				transform: scale(1.05);
 			}
 		}
 
 		@keyframes twinkleStar {
 			0% { transform: scale(0.2); opacity: 0; }
 			50% { transform: scale(1.2); opacity: 1; }
-			100% { transform: scale(0.5) translateY(-40px); opacity: 0; }
+			100% { transform: scale(0.5) translateY(-30px); opacity: 0; }
 		}
 	</style>
 </head>
@@ -164,18 +163,18 @@
 	<div id="beyond-overlay" class="beyond-container">
 		<div class="space-atmosphere"></div>
 		
-		<!-- 巨大な飛行機と軌跡のSVG -->
-		<svg viewBox="0 0 1920 1080" preserveAspectRatio="none">
+		<!-- スマホの縦横比に合わせた飛行機ルートのSVG -->
+		<svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
 			<path id="flight-path" class="contrail" d="" pathLength="2500" />
 			<g id="flight-plane" class="plane-group">
-				<!-- スケールを大きくして「巨大な飛行機」に拡張 -->
-				<g transform="scale(6) translate(-12, -21)">
+				<!-- スマホ画面でベストなバランスになるスケール調整 -->
+				<g transform="scale(4.5) translate(-12, -21)">
 					<path class="plane-icon" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
 				</g>
 			</g>
 		</svg>
 
-		<!-- 世界のモニュメント・グルメが流れるコンテナ -->
+		<!-- 世界のモニュメントシルエットが流れるコンテナ -->
 		<div id="monuments-layer" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none;"></div>
 		<!-- 星屑レイヤー -->
 		<div id="particles-layer" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none;"></div>
@@ -193,24 +192,24 @@
 			let isTracking = false;
 			let flightInterval = null;
 
-			// 大空をダイナミックに横切る壮大なルート
+			// スマホの縦長画面（1080x1920ベース）に合わせたダイナミックなクロスルート
 			const routes = [
-				{ path: "M -100,900 Q 960,200 2020,150", rotate: "auto 45deg" },
-				{ path: "M -100,200 Q 960,900 2020,900", rotate: "auto -45deg" }
+				{ path: "M -100,1400 Q 540,600 1180,400", rotate: "auto 35deg" },
+				{ path: "M -100,500 Q 540,1300 1180,1400", rotate: "auto -35deg" }
 			];
 
-			// 世界の観光地・建物のSVGシルエット集（エッフェル塔、東京タワー、ピザの斜塔、富士山、自由の女神など）
+			// 世界の名所シルエット集
 			const monumentSvgs = [
-				// エッフェル塔
-				`<svg viewBox="0 0 24 24"><path d="M12 2l2 19h-4l2-19zm-1.5 5h3l-.5 4h-2l-.5-4zm-.8 6h4.6l-.8 6h-3l-.8-6z"/></svg>`,
-				// 富士山（山容）
-				`<svg viewBox="0 0 24 24"><path d="M2 20l10-16 10 16H2zm10-11l-6 10h12l-6-10z"/></svg>`,
-				// 東京タワー / 建造物
-				`<svg viewBox="0 0 24 24"><path d="M11 2h2v3h-2V2zm-1 5h4l1 15H9l1-15zm1 3h2v5h-2v-5zm0 7h2v3h-2v-3z"/></svg>`,
-				// ピザの斜塔（斜めに傾いた塔）
-				`<svg viewBox="0 0 24 24"><path d="M9 3l3-1 2 20h-4L9 3zm-1 5h6v2H8V8zm1 5h4v2H9v-2zm-1 5h6v2H8v-2z" transform="skewX(-10)"/></svg>`,
-				// グランドキャニオン・山岳レイヤー
-				`<svg viewBox="0 0 24 24"><path d="M2 22l4-8 3 4 5-10 6 14H2z"/></svg>`
+				// 1. エッフェル塔
+				`<svg viewBox="0 0 24 24"><path d="M11 2h2l2 6h-6l2-6zm-1 7h4l1 6h-6l1-6zm-2 7h8l1 6h-10l1-6z"/></svg>`,
+				// 2. 富士山
+				`<svg viewBox="0 0 24 24"><path d="M2 22l10-16 10 16H2zm10-12l-4 7h8l-4-7z"/></svg>`,
+				// 3. 東京タワー
+				`<svg viewBox="0 0 24 24"><path d="M11 2h2v3h-2V2zm-1 4h4l1.5 14h-7l1.5-14zm1 3h2v4h-2V9zm0 5h2v5h-2v-5 z"/></svg>`,
+				// 4. ピザの斜塔
+				`<svg viewBox="0 0 24 24"><path d="M9 3l3-1 2 20h-4L9 3zm-1 5h6v2H8V8zm1 5h4v2H9v-2zm-1 5h6v2H8v-2z" transform="skewX(-8)"/></svg>`,
+				// 5. 自由の女神
+				`<svg viewBox="0 0 24 24"><path d="M10 2l1 3-2 1-1-2-1 2-2-1 1-3h4zm1 4h2l1 14h-4l1-14zm-2 3h6v2H9V9z"/></svg>`
 			];
 
 			function spawnMonument() {
@@ -218,16 +217,12 @@
 				const wrapper = document.createElement("div");
 				wrapper.className = "monument-item";
 				
-				// ランダムにモニュメントを選択
 				const svgContent = monumentSvgs[Math.floor(Math.random() * monumentSvgs.length)];
 				wrapper.innerHTML = svgContent;
 
-				// ランダムな高さ（上下の位置）を調整
-				const randomBottom = Math.floor(Math.random() * 40) + 10; // 10vh ~ 50vh
+				const randomBottom = Math.floor(Math.random() * 25) + 15;
 				wrapper.style.bottom = `${randomBottom}vh`;
-				
-				// アニメーションの速度を少しずつ変える
-				wrapper.style.animationDuration = `${Math.random() * 1.5 + 3.0}s`;
+				wrapper.style.animationDuration = `${Math.random() * 1.0 + 3.2}s`;
 
 				monumentsLayer.appendChild(wrapper);
 				setTimeout(() => wrapper.remove(), 4000);
@@ -255,12 +250,11 @@
 				void beyondOverlay.offsetWidth;
 				beyondOverlay.classList.add("is-animating");
 
-				// 飛行機の飛行に合わせてモニュメントと星屑を次々に流す
-				for (let i = 0; i < 4; i++) {
-					setTimeout(spawnMonument, i * 700);
+				for (let i = 0; i < 3; i++) {
+					setTimeout(spawnMonument, i * 750);
 				}
-				for (let i = 0; i < 6; i++) {
-					setTimeout(spawnStardust, i * 250);
+				for (let i = 0; i < 5; i++) {
+					setTimeout(spawnStardust, i * 300);
 				}
 			}
 
