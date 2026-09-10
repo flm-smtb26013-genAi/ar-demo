@@ -32,6 +32,10 @@
 
 		<!-- ターゲット認識時にイベントを受け取るため id="ar-target" を付与 -->
 		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
+			<!-- 
+				最初から見えないよう visible="false" に設定
+				認識したら visible="true" にしてアニメーションを再生します
+			-->
 			<a-plane
 				id="target-image"
 				src="#site-icon"
@@ -39,27 +43,27 @@
 				width="2.5"
 				height="0.5"
 				position="0 0 0.1"
-				material="shader: flat; opacity: 0;"
-				scale="0 0 0"
-				animation__scale="property: scale; from: 0 0 0; to: 1 1 1; dur: 800; easing: easeOutBack; startEvents: animateIn;"
-				animation__fade="property: material.opacity; from: 0; to: 1; dur: 800; startEvents: animateIn;">
+				material="shader: flat; opacity: 1;"
+				visible="false"
+				scale="0.1 0.1 0.1"
+				animation="property: scale; from: 0.1 0.1 0.1; to: 1 1 1; dur: 800; easing: easeOutBack; startEvents: animateIn;">
 			</a-plane>
 		</a-entity>
 	</a-scene>
 
 	<script>
-		// マーカーを認識した瞬間にカスタムイベントを発火させる仕組み
 		document.addEventListener("DOMContentLoaded", function() {
 			const targetEntity = document.querySelector("#ar-target");
 			const targetImage = document.querySelector("#target-image");
 
 			targetEntity.addEventListener("targetFound", event => {
 				console.log("ターゲットを認識しました！");
-				// 一度サイズと透明度をリセットしてからアニメーション用イベントを送る
-				targetImage.setAttribute("scale", "0 0 0");
-				targetImage.setAttribute("material", "opacity", 0);
+				// 1. まず表示状態をONにする
+				targetImage.setAttribute("visible", "true");
+				// 2. サイズを一度小さくリセット
+				targetImage.setAttribute("scale", "0.1 0.1 0.1");
 				
-				// 少しだけ遅延させてアニメーションを発火
+				// 3. 少しだけ遅延させてアニメーション発火
 				setTimeout(() => {
 					targetImage.emit("animateIn");
 				}, 50);
@@ -67,9 +71,8 @@
 
 			targetEntity.addEventListener("targetLost", event => {
 				console.log("ターゲットを見失いました");
-				// 見失ったときは見えない状態に戻す
-				targetImage.setAttribute("scale", "0 0 0");
-				targetImage.setAttribute("material", "opacity", 0);
+				// 見失ったら非表示に戻す
+				targetImage.setAttribute("visible", "false");
 			});
 		});
 	</script>
