@@ -3,36 +3,73 @@
 
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- A-Frame v1.5.0 -->
 	<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+	<!-- MindAR for A-Frame v1.2.5 -->
 	<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 	<style>
-		body { margin: 0; overflow: hidden; }
-		#debug-status {
-			position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
-			background: rgba(0, 0, 0, 0.7); color: #fff; padding: 6px 16px;
-			border-radius: 20px; font-size: 14px; z-index: 100; pointer-events: none;
-			font-family: sans-serif;
+		body {
+			margin: 0;
+			overflow: hidden;
 		}
+
+		/* 全画面SVGフライトステージ */
 		.flight-svg-container {
-			position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-			pointer-events: none; z-index: 10; display: none;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			pointer-events: none;
+			z-index: 10;
+			display: none; /* マーカー認識時のみ表示 */
 		}
-		.flight-svg-container.active { display: block; }
-		.flight-svg-container svg { width: 100%; height: 100%; overflow: hidden; }
+
+		.flight-svg-container.active {
+			display: block;
+		}
+
+		.flight-svg-container svg {
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+
 		.contrail {
-			fill: none; stroke: #F0F3FA; stroke-width: 4px; stroke-linecap: round;
-			stroke-dasharray: 2000; stroke-dashoffset: 2000; opacity: 0;
+			fill: none;
+			stroke: #F0F3FA;
+			stroke-width: 4px;
+			stroke-linecap: round;
+			stroke-dasharray: 2000;
+			stroke-dashoffset: 2000;
+			opacity: 0;
 		}
-		.plane-group { opacity: 0; }
-		.is-animating .contrail { animation: drawContrail 2.2s cubic-bezier(0.35, 0, 0.25, 1) forwards; }
-		.is-animating .plane-group { animation: flyPlane 2.2s cubic-bezier(0.35, 0, 0.25, 1) forwards; }
-		.plane-icon { fill: #F0F3FA; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)); }
+
+		.plane-group {
+			opacity: 0;
+		}
+
+		/* アニメーション動的付与用クラス */
+		.is-animating .contrail {
+			animation: drawContrail 2.2s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+		}
+
+		.is-animating .plane-group {
+			animation: flyPlane 2.2s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+		}
+
+		.plane-icon {
+			fill: #F0F3FA;
+			filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+		}
+
 		@keyframes flyPlane {
 			0% { offset-distance: 0%; opacity: 0; }
 			5% { opacity: 1; }
 			90% { opacity: 1; }
 			100% { offset-distance: 100%; opacity: 0; }
 		}
+
 		@keyframes drawContrail {
 			0% { stroke-dashoffset: 2000; opacity: 0; }
 			10% { opacity: 0.9; }
@@ -43,46 +80,24 @@
 </head>
 
 <body>
-	<div id="debug-status">マーカーを探索中...</div>
-
+	<!-- A-Scene (ARマーカー認識のみに使用し、中身の3D要素はなし) -->
 	<a-scene
-		mindar-image="imageTargetSrc: ./targets.mind; maxTrack: 2;"
+		mindar-image="imageTargetSrc: ./top.mind; maxTrack: 1;"
 		color-space="sRGB"
 		renderer="colorManagement: true, physicallyCorrectLights"
 		vr-mode-ui="enabled: false"
 		device-orientation-permission-ui="enabled: false">
 
-		<a-assets>
-			<img id="mystery-img" src="./mystery.png" />
-		</a-assets>
-
 		<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-		<!-- ターゲット 0 -->
-		<a-entity id="ar-target-0" mindar-image-target="targetIndex: 0">
-			<a-plane visible="false" width="1" height="1"></a-plane>
-		</a-entity>
-
-		<!-- ターゲット 1 -->
-		<a-entity id="ar-target-1" mindar-image-target="targetIndex: 1">
-			<a-plane
-				id="mystery-plane"
-				src="#mystery-img"
-				transparent="true"
-				width="1.4"
-				height="0.58"
-				position="0.8 0.4 0.1"
-				material="shader: flat; opacity: 1;"
-				visible="false"
-				scale="0.1 0.1 0.1"
-				animation="property: scale; from: 0.1 0.1 0.1; to: 1 1 1; dur: 800; easing: easeOutBack; startEvents: animateIn;">
-			</a-plane>
-		</a-entity>
+		<a-entity id="ar-target" mindar-image-target="targetIndex: 0"></a-entity>
 	</a-scene>
 
+	<!-- 飛行機と軌跡専用のSVGオーバーレイレイヤー -->
 	<div id="flight-overlay" class="flight-svg-container">
 		<svg viewBox="0 0 1920 1080" preserveAspectRatio="none">
+			<!-- 飛行機雲の軌跡 -->
 			<path id="flight-path" class="contrail" d="" pathLength="2000" />
+			<!-- 飛行機アイコン -->
 			<g id="flight-plane" class="plane-group">
 				<g transform="scale(3.5) translate(-12, -21)">
 					<path class="plane-icon" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
@@ -91,76 +106,71 @@
 		</svg>
 	</div>
 
-	<script>
+    <script>
 		document.addEventListener("DOMContentLoaded", function() {
-			const target0 = document.querySelector("#ar-target-0");
-			const target1 = document.querySelector("#ar-target-1");
-			
+			const targetEntity = document.querySelector("#ar-target");
 			const flightOverlay = document.getElementById("flight-overlay");
 			const flightPath = document.getElementById("flight-path");
 			const flightPlane = document.getElementById("flight-plane");
-			const mysteryPlane = document.querySelector("#mystery-plane");
-			const debugStatus = document.getElementById("debug-status");
 
-			let isTrackingTop = false;
+			let isTracking = false;
 			let flightInterval = null;
 
+			// ランダムな飛行ルートのパターン定義（左下→右上、右下→左上、左上→右下など）
 			const routes = [
-				{ path: "M -120,1180 Q 960,980 2050,-120", rotate: "auto 90deg" },
-				{ path: "M 2050,1180 Q 960,980 -120,-120", rotate: "auto -90deg" },
-				{ path: "M -120,-120 Q 960,200 2050,1180", rotate: "auto 90deg" },
-				{ path: "M 1000,-120 Q 500,600 100,1180",  rotate: "auto 180deg" }
+				{ path: "M -120,1180 Q 960,980 2050,-120", rotate: "auto 90deg" }, // 左下 ⇒ 右上
+				{ path: "M 2050,1180 Q 960,980 -120,-120", rotate: "auto -90deg" }, // 右下 ⇒ 左上
+				{ path: "M -120,-120 Q 960,200 2050,1180", rotate: "auto 90deg" }, // 左上 ⇒ 右下
+				{ path: "M 1000,-120 Q 500,600 100,1180",  rotate: "auto 180deg" } // 上 ⇒ 下
 			];
 
 			function launchFlight() {
-				if (!isTrackingTop) return;
+				if (!isTracking) return;
+
+				// ランダムにルートを1つ選択
 				const randomRoute = routes[Math.floor(Math.random() * routes.length)];
+				
+				// パスと軌道を適用
 				flightPath.setAttribute("d", randomRoute.path);
 				flightPlane.style.offsetPath = `path("${randomRoute.path}")`;
 				flightPlane.style.offsetRotate = randomRoute.rotate;
+
+				// アニメーションクラスを一度外して再付与（毎回リセットして再発火させるため）
 				flightOverlay.classList.remove("is-animating");
-				void flightOverlay.offsetWidth;
+				void flightOverlay.offsetWidth; // DOMリフロー強制
 				flightOverlay.classList.add("is-animating");
 			}
 
-			// どちらのターゲットが反応しても分かるように共通のハンドラを設定
-			function handleTargetFound(index) {
-				console.log(`ターゲット [${index}] を認識しました`);
-				if (index === 0) {
-					debugStatus.textContent = "インデックス0 (飛行機) 認識中！";
-					debugStatus.style.background = "rgba(0, 128, 0, 0.8)";
-					isTrackingTop = true;
-					flightOverlay.classList.add("active");
-					launchFlight();
-					if (!flightInterval) flightInterval = setInterval(launchFlight, 1000);
-				} else if (index === 1) {
-					debugStatus.textContent = "インデックス1 (ミステリー) 認識中！";
-					debugStatus.style.background = "rgba(0, 110, 180, 0.8)";
-					mysteryPlane.setAttribute("visible", "true");
-					mysteryPlane.setAttribute("scale", "0.1 0.1 0.1");
-					setTimeout(() => mysteryPlane.emit("animateIn"), 50);
+			// ターゲットを認識したとき
+			targetEntity.addEventListener("targetFound", event => {
+				console.log("ターゲット認識：飛行機の発進を開始");
+				isTracking = true;
+				flightOverlay.classList.add("active");
+
+				// 初回即座に飛ばす
+				launchFlight();
+
+				// 一定時間（例: 3.5秒ごと）に何度も繰り返し飛ばす
+				if (!flightInterval) {
+					flightInterval = setInterval(() => {
+						launchFlight();
+					}, 3500);
 				}
-			}
+			});
 
-			function handleTargetLost(index) {
-				console.log(`ターゲット [${index}] を見失いました`);
-				debugStatus.textContent = "マーカーを探索中...";
-				debugStatus.style.background = "rgba(0, 0, 0, 0.7)";
-				if (index === 0) {
-					isTrackingTop = false;
-					flightOverlay.classList.remove("active");
-					flightOverlay.classList.remove("is-animating");
-					if (flightInterval) { clearInterval(flightInterval); flightInterval = null; }
-				} else if (index === 1) {
-					mysteryPlane.setAttribute("visible", "false");
+			// ターゲットを見失ったとき
+			targetEntity.addEventListener("targetLost", event => {
+				console.log("ターゲットを見失いました");
+				isTracking = false;
+				flightOverlay.classList.remove("active");
+				flightOverlay.classList.remove("is-animating");
+
+				// タイマーをクリア
+				if (flightInterval) {
+					clearInterval(flightInterval);
+					flightInterval = null;
 				}
-			}
-
-			target0.addEventListener("targetFound", () => handleTargetFound(0));
-			target0.addEventListener("targetLost", () => handleTargetLost(0));
-
-			target1.addEventListener("targetFound", () => handleTargetFound(1));
-			target1.addEventListener("targetLost", () => handleTargetLost(1));
+			});
 		});
 	</script>
 </body>
