@@ -11,10 +11,11 @@
 		body {
 			margin: 0;
 			overflow: hidden;
+			background-color: #050b14;
 		}
 
-		/* 全画面SVGフライトステージ */
-		.flight-svg-container {
+		/* 全画面演出ステージ */
+		.beyond-container {
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -22,104 +23,121 @@
 			height: 100vh;
 			pointer-events: none;
 			z-index: 10;
-			display: none; /* マーカー認識時のみ表示 */
+			display: none;
+			overflow: hidden;
 		}
 
-		.flight-svg-container.active {
+		.beyond-container.active {
 			display: block;
 		}
 
-		.flight-svg-container svg {
+		/* 空間を包み込む光のグラデーション背景オーバーレイ */
+		.space-atmosphere {
+			position: absolute;
+			inset: 0;
+			background: radial-gradient(circle at 50% 50%, rgba(30, 58, 115, 0.4) 0%, rgba(5, 11, 20, 0.85) 80%);
+			opacity: 0;
+			transition: opacity 1.5s ease;
+		}
+		.beyond-container.active .space-atmosphere {
+			opacity: 1;
+		}
+
+		svg {
 			width: 100%;
 			height: 100%;
-			overflow: hidden;
 		}
 
 		.contrail {
 			fill: none;
-			stroke: #F0F3FA;
-			stroke-width: 4px;
+			stroke: #a5c4ff;
+			stroke-width: 3px;
 			stroke-linecap: round;
 			stroke-dasharray: 2000;
 			stroke-dashoffset: 2000;
 			opacity: 0;
+			filter: drop-shadow(0 0 8px rgba(135, 206, 250, 0.8));
 		}
 
 		.plane-group {
 			opacity: 0;
 		}
 
-		/* アニメーション動的付与用クラス */
 		.is-animating .contrail {
-			animation: drawContrail 2.2s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+			animation: drawContrail 2.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 		}
 
 		.is-animating .plane-group {
-			animation: flyPlane 2.2s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+			animation: flyPlane 2.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 		}
 
 		.plane-icon {
-			fill: #F0F3FA;
-			filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+			fill: #ffffff;
+			filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
 		}
 
-		/* 追加：旅のモチーフ（ホテル・ロケーション・星など）がふんわり浮かぶスタイル */
-		.travel-element {
+		/* 星屑・光の粒子エフェクト */
+		.stardust {
 			position: absolute;
-			color: #F0F3FA;
-			font-family: sans-serif;
-			font-weight: bold;
-			font-size: 14px;
-			letter-spacing: 2px;
-			padding: 6px 14px;
-			background: rgba(26, 54, 93, 0.75);
-			border: 1px solid rgba(240, 243, 250, 0.4);
-			border-radius: 20px;
-			backdrop-filter: blur(4px);
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			width: 6px;
+			height: 6px;
+			background: #ffffff;
+			border-radius: 50%;
+			box-shadow: 0 0 10px #ffffff, 0 0 20px #70a1ff;
 			opacity: 0;
 			pointer-events: none;
-			transform: scale(0.8);
-			animation: floatTravelElement 2.5s ease-out forwards;
+			animation: twinkleStar 2s ease-in-out forwards;
+		}
+
+		/* 想像のちょっと先へ：浮遊するワードタグ（神殿から宇宙への旅をイメージ） */
+		.dream-tag {
+			position: absolute;
+			color: #e8f0fe;
+			font-family: sans-serif;
+			font-weight: 300;
+			font-size: 13px;
+			letter-spacing: 3px;
+			padding: 8px 18px;
+			background: rgba(10, 25, 47, 0.65);
+			border: 1px solid rgba(165, 196, 255, 0.3);
+			border-radius: 30px;
+			backdrop-filter: blur(8px);
+			box-shadow: 0 0 20px rgba(30, 144, 255, 0.2);
+			opacity: 0;
+			transform: translateY(25px) scale(0.85);
+			animation: riseDreamTag 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 		}
 
 		@keyframes flyPlane {
 			0% { offset-distance: 0%; opacity: 0; }
-			5% { opacity: 1; }
+			10% { opacity: 1; }
 			90% { opacity: 1; }
 			100% { offset-distance: 100%; opacity: 0; }
 		}
 
 		@keyframes drawContrail {
 			0% { stroke-dashoffset: 2000; opacity: 0; }
-			10% { opacity: 0.9; }
-			85% { opacity: 0.9; }
+			15% { opacity: 1; }
+			85% { opacity: 1; }
 			100% { stroke-dashoffset: 0; opacity: 0; }
 		}
 
-		@keyframes floatTravelElement {
-			0% {
-				opacity: 0;
-				transform: translateY(20px) scale(0.8);
-			}
-			30% {
-				opacity: 1;
-				transform: translateY(0px) scale(1);
-			}
-			80% {
-				opacity: 1;
-				transform: translateY(-15px) scale(1);
-			}
-			100% {
-				opacity: 0;
-				transform: translateY(-30px) scale(0.9);
-			}
+		@keyframes twinkleStar {
+			0% { transform: scale(0.2); opacity: 0; }
+			50% { transform: scale(1.2); opacity: 1; }
+			100% { transform: scale(0.5) translateY(-30px); opacity: 0; }
+		}
+
+		@keyframes riseDreamTag {
+			0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+			25% { opacity: 1; transform: translateY(0px) scale(1); }
+			75% { opacity: 1; transform: translateY(-10px) scale(1); }
+			100% { opacity: 0; transform: translateY(-35px) scale(0.95); }
 		}
 	</style>
 </head>
 
 <body>
-	<!-- A-Scene (ARマーカー認識のみに使用) -->
 	<a-scene
 		mindar-image="imageTargetSrc: ./top.mind; maxTrack: 1;"
 		color-space="sRGB"
@@ -131,111 +149,100 @@
 		<a-entity id="ar-target" mindar-image-target="targetIndex: 0"></a-entity>
 	</a-scene>
 
-	<!-- 飛行機と軌跡、旅のアニメーション専用のオーバーレイレイヤー -->
-	<div id="flight-overlay" class="flight-svg-container">
+	<!-- Beyond a bit 風 演出レイヤー -->
+	<div id="beyond-overlay" class="beyond-container">
+		<div class="space-atmosphere"></div>
 		<svg viewBox="0 0 1920 1080" preserveAspectRatio="none">
-			<!-- 飛行機雲の軌跡 -->
 			<path id="flight-path" class="contrail" d="" pathLength="2000" />
-			<!-- 飛行機アイコン -->
 			<g id="flight-plane" class="plane-group">
 				<g transform="scale(3.5) translate(-12, -21)">
 					<path class="plane-icon" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
 				</g>
 			</g>
 		</svg>
-		<!-- 旅のワードが動的に湧き出るコンテナ -->
-		<div id="travel-elements-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;"></div>
+		<div id="particles-layer" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none;"></div>
 	</div>
 
-    <script>
+	<script>
 		document.addEventListener("DOMContentLoaded", function() {
 			const targetEntity = document.querySelector("#ar-target");
-			const flightOverlay = document.getElementById("flight-overlay");
+			const beyondOverlay = document.getElementById("beyond-overlay");
 			const flightPath = document.getElementById("flight-path");
 			const flightPlane = document.getElementById("flight-plane");
-			const travelLayer = document.getElementById("travel-elements-layer");
+			const particlesLayer = document.getElementById("particles-layer");
 
 			let isTracking = false;
 			let flightInterval = null;
 
-			// ランダムな飛行ルートのパターン定義
+			// 宇宙をめぐるようなダイナミックな曲線ルート
 			const routes = [
-				{ path: "M -120,1180 Q 960,980 2050,-120", rotate: "auto 90deg" },
-				{ path: "M 2050,1180 Q 960,980 -120,-120", rotate: "auto -90deg" },
-				{ path: "M -120,-120 Q 960,200 2050,1180", rotate: "auto 90deg" },
-				{ path: "M 1000,-120 Q 500,600 100,1180",  rotate: "auto 180deg" }
+				{ path: "M -100,1100 Q 960,800 2020,-100", rotate: "auto 90deg" },
+				{ path: "M 2020,1100 Q 960,800 -100,-100", rotate: "auto -90deg" },
+				{ path: "M 500,-100 Q 200,600 1800,1100", rotate: "auto 45deg" }
 			];
 
-			// 旅行にちなんだ浮かび上がらせるテキストやタグの候補
-			const travelKeywords = [
-				"✈️ HOTEL", "🌴 RESORT", "✨ MONOTRIP", "📸 MEMORIES", 
-				"🗺️ ADVENTURE", "🌟 SPECIAL PRICE", "🏖️ VACATION", "🚅 TOUR"
+			// ワールドの情緒を感じさせるキーワード
+			const worldKeywords = [
+				"✨ Beyond a bit", "🌌 想像のちょっと先へ", "🌟 星と生きた軌跡", 
+				"💫 音楽と光の旅", "🕊️ 静寂の宇宙空間", "💎 始まりの種子"
 			];
 
-			function spawnTravelElement() {
+			function spawnStardust() {
 				if (!isTracking) return;
-
-				const el = document.createElement("div");
-				el.className = "travel-element";
-				el.innerText = travelKeywords[Math.floor(Math.random() * travelKeywords.length)];
-
-				// 画面内のランダムな位置に配置
-				const randomX = Math.random() * 70 + 15; // 15% 〜 85%
-				const randomY = Math.random() * 60 + 20; // 20% 〜 80%
-				el.style.left = `${randomX}%`;
-				el.style.top = `${randomY}%`;
-
-				travelLayer.appendChild(el);
-
-				// アニメーション終了後にDOMから削除
-				setTimeout(() => {
-					el.remove();
-				}, 2500);
+				const star = document.createElement("div");
+				star.className = "stardust";
+				star.style.left = `${Math.random() * 90 + 5}%`;
+				star.style.top = `${Math.random() * 80 + 10}%`;
+				particlesLayer.appendChild(star);
+				setTimeout(() => star.remove(), 2000);
 			}
 
-			function launchFlight() {
+			function spawnDreamTag() {
 				if (!isTracking) return;
-
-				// ランダムにルートを1つ選択
-				const randomRoute = routes[Math.floor(Math.random() * routes.length)];
-				
-				// パスと軌道を適用
-				flightPath.setAttribute("d", randomRoute.path);
-				flightPlane.style.offsetPath = `path("${randomRoute.path}")`;
-				flightPlane.style.offsetRotate = randomRoute.rotate;
-
-				// アニメーションクラスを一度外して再付与
-				flightOverlay.classList.remove("is-animating");
-				void flightOverlay.offsetWidth; 
-				flightOverlay.classList.add("is-animating");
-
-				// 飛行機の飛び出しに合わせて旅行ワードをいくつかポップアップさせる
-				setTimeout(spawnTravelElement, 400);
-				setTimeout(spawnTravelElement, 1100);
+				const tag = document.createElement("div");
+				tag.className = "dream-tag";
+				tag.innerText = worldKeywords[Math.floor(Math.random() * worldKeywords.length)];
+				tag.style.left = `${Math.random() * 60 + 20}%`;
+				tag.style.top = `${Math.random() * 50 + 25}%`;
+				particlesLayer.appendChild(tag);
+				setTimeout(() => tag.remove(), 3000);
 			}
 
-			// ターゲットを認識したとき
-			targetEntity.addEventListener("targetFound", event => {
-				console.log("ターゲット認識：飛行機と旅行アニメーションを開始");
+			function triggerSequence() {
+				if (!isTracking) return;
+
+				const route = routes[Math.floor(Math.random() * routes.length)];
+				flightPath.setAttribute("d", route.path);
+				flightPlane.style.offsetPath = `path("${route.path}")`;
+				flightPlane.style.offsetRotate = route.rotate;
+
+				beyondOverlay.classList.remove("is-animating");
+				void beyondOverlay.offsetWidth;
+				beyondOverlay.classList.add("is-animating");
+
+				// 星屑や言葉をタイミングよく散りばめる
+				for (let i = 0; i < 5; i++) {
+					setTimeout(spawnStardust, i * 300);
+				}
+				setTimeout(spawnDreamTag, 500);
+				setTimeout(spawnDreamTag, 1400);
+			}
+
+			targetEntity.addEventListener("targetFound", () => {
 				isTracking = true;
-				flightOverlay.classList.add("active");
-
-				launchFlight();
+				beyondOverlay.classList.add("active");
+				triggerSequence();
 
 				if (!flightInterval) {
-					flightInterval = setInterval(() => {
-						launchFlight();
-					}, 3500);
+					flightInterval = setInterval(triggerSequence, 4000);
 				}
 			});
 
-			// ターゲットを見失ったとき
-			targetEntity.addEventListener("targetLost", event => {
-				console.log("ターゲットを見失いました");
+			targetEntity.addEventListener("targetLost", () => {
 				isTracking = false;
-				flightOverlay.classList.remove("active");
-				flightOverlay.classList.remove("is-animating");
-				travelLayer.innerHTML = ""; // 残っている要素をクリア
+				beyondOverlay.classList.remove("active");
+				beyondOverlay.classList.remove("is-animating");
+				particlesLayer.innerHTML = "";
 
 				if (flightInterval) {
 					clearInterval(flightInterval);
