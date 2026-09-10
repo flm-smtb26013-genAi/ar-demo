@@ -30,30 +30,49 @@
 
 		<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-		<a-entity mindar-image-target="targetIndex: 0">
-			<!-- 
-				【修正ポイント】 animation属性の記述をセミコロン区切りに統一しました。
-				
-				動作内容：
-				1. 透明度(opacity)が0から1になる（フェードイン）
-				2. Z軸方向の位置(position)が奥(0.5)から手前(0.1)に移動する（スライドイン）
-				
-				delay: 500（0.5秒遅らせて開始）
-				dur: 1000（1秒かけてアニメーション）
-			-->
+		<!-- ターゲット認識時にイベントを受け取るため id="ar-target" を付与 -->
+		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
 			<a-plane
 				id="target-image"
 				src="#site-icon"
 				transparent="true"
 				width="2.5"
 				height="0.5"
-				position="0 0 0.5"
+				position="0 0 0.1"
 				material="shader: flat; opacity: 0;"
-				animation__fade="property: material.opacity; from: 0; to: 1; dur: 1000; startEvents: targetFound;"
-				animation__move="property: position; from: 0 0 0.5; to: 0 0 0.1; dur: 1000; easing: easeOutCubic; startEvents: targetFound;">
+				scale="0 0 0"
+				animation__scale="property: scale; from: 0 0 0; to: 1 1 1; dur: 800; easing: easeOutBack; startEvents: animateIn;"
+				animation__fade="property: material.opacity; from: 0; to: 1; dur: 800; startEvents: animateIn;">
 			</a-plane>
 		</a-entity>
 	</a-scene>
+
+	<script>
+		// マーカーを認識した瞬間にカスタムイベントを発火させる仕組み
+		document.addEventListener("DOMContentLoaded", function() {
+			const targetEntity = document.querySelector("#ar-target");
+			const targetImage = document.querySelector("#target-image");
+
+			targetEntity.addEventListener("targetFound", event => {
+				console.log("ターゲットを認識しました！");
+				// 一度サイズと透明度をリセットしてからアニメーション用イベントを送る
+				targetImage.setAttribute("scale", "0 0 0");
+				targetImage.setAttribute("material", "opacity", 0);
+				
+				// 少しだけ遅延させてアニメーションを発火
+				setTimeout(() => {
+					targetImage.emit("animateIn");
+				}, 50);
+			});
+
+			targetEntity.addEventListener("targetLost", event => {
+				console.log("ターゲットを見失いました");
+				// 見失ったときは見えない状態に戻す
+				targetImage.setAttribute("scale", "0 0 0");
+				targetImage.setAttribute("material", "opacity", 0);
+			});
+		});
+	</script>
 </body>
 
 </html>
