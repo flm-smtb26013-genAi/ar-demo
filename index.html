@@ -22,7 +22,7 @@
 		device-orientation-permission-ui="enabled: false">
 
 		<a-assets>
-			<!-- 表示したいアイコン画像 -->
+			<!-- 表示したい画像（2枚目の画像） -->
 			<img id="site-icon" src="./top.png" />
 		</a-assets>
 
@@ -30,17 +30,21 @@
 
 		<a-entity mindar-image-target="targetIndex: 0">
 			<!-- 
-				material="shader: flat": 光源なしでも黒くならずそのまま発色
-				transparent="true": 背景透過PNGに対応
-				position="0 0 0.1": マーカーの少し手前（Z軸）に浮かせる
+				animation属性を追加：
+				- property: scale（サイズを変化させる）
+				- from: 0 0 0（最初は見えない小ささ）
+				- to: 1 1 1（元のサイズ）
+				- dur: 800（アニメーションにかかる時間：ミリ秒）
+				- easing: easeOutBack（少しボヨンと弾むような動き）
 			-->
 			<a-plane
 				src="#site-icon"
 				transparent="true"
-				width="5.0"
-				height="0.5"
+				width="3.5"
+				height="1.0"
 				position="0 0 0.1"
-				material="shader: flat">
+				material="shader: flat"
+				animation="property: scale; from: 0 0 0; to: 1 1 1; dur: 800; easing: easeOutBack;">
 			</a-plane>
 		</a-entity>
 	</a-scene>
