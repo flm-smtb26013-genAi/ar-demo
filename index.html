@@ -80,16 +80,37 @@
 </head>
 
 <body>
-	<!-- A-Scene (ARマーカー認識のみに使用し、中身の3D要素はなし) -->
+	<!-- A-Scene (mystery.mind をターゲットに指定) -->
 	<a-scene
-		mindar-image="imageTargetSrc: ./top.mind; maxTrack: 1;"
+		mindar-image="imageTargetSrc: ./mystery.mind; maxTrack: 1;"
 		color-space="sRGB"
 		renderer="colorManagement: true, physicallyCorrectLights"
 		vr-mode-ui="enabled: false"
 		device-orientation-permission-ui="enabled: false">
 
+		<a-assets>
+			<!-- 表示したい画像（mystery.png） -->
+			<img id="mystery-img" src="./mystery.png" />
+		</a-assets>
+
 		<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-		<a-entity id="ar-target" mindar-image-target="targetIndex: 0"></a-entity>
+
+		<!-- ターゲット認識用コンテナ -->
+		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
+			<!-- mystery.png をターゲットの少し右上 (position="0.8 0.4 0.1") に配置 -->
+			<a-plane
+				id="mystery-plane"
+				src="#mystery-img"
+				transparent="true"
+				width="1.8"
+				height="0.75"
+				position="0.8 0.4 0.1"
+				material="shader: flat; opacity: 1;"
+				visible="false"
+				scale="0.1 0.1 0.1"
+				animation="property: scale; from: 0.1 0.1 0.1; to: 1 1 1; dur: 800; easing: easeOutBack; startEvents: animateIn;">
+			</a-plane>
+		</a-entity>
 	</a-scene>
 
 	<!-- 飛行機と軌跡専用のSVGオーバーレイレイヤー -->
@@ -106,9 +127,10 @@
 		</svg>
 	</div>
 
-    <script>
+	<script>
 		document.addEventListener("DOMContentLoaded", function() {
 			const targetEntity = document.querySelector("#ar-target");
+			const mysteryPlane = document.querySelector("#mystery-plane");
 			const flightOverlay = document.getElementById("flight-overlay");
 			const flightPath = document.getElementById("flight-path");
 			const flightPlane = document.getElementById("flight-plane");
@@ -116,7 +138,7 @@
 			let isTracking = false;
 			let flightInterval = null;
 
-			// ランダムな飛行ルートのパターン定義（左下→右上、右下→左上、左上→右下など）
+			// ランダムな飛行ルートのパターン定義
 			const routes = [
 				{ path: "M -120,1180 Q 960,980 2050,-120", rotate: "auto 90deg" }, // 左下 ⇒ 右上
 				{ path: "M 2050,1180 Q 960,980 -120,-120", rotate: "auto -90deg" }, // 右下 ⇒ 左上
@@ -127,34 +149,37 @@
 			function launchFlight() {
 				if (!isTracking) return;
 
-				// ランダムにルートを1つ選択
 				const randomRoute = routes[Math.floor(Math.random() * routes.length)];
 				
-				// パスと軌道を適用
 				flightPath.setAttribute("d", randomRoute.path);
 				flightPlane.style.offsetPath = `path("${randomRoute.path}")`;
 				flightPlane.style.offsetRotate = randomRoute.rotate;
 
-				// アニメーションクラスを一度外して再付与（毎回リセットして再発火させるため）
 				flightOverlay.classList.remove("is-animating");
-				void flightOverlay.offsetWidth; // DOMリフロー強制
+				void flightOverlay.offsetWidth;
 				flightOverlay.classList.add("is-animating");
 			}
 
 			// ターゲットを認識したとき
 			targetEntity.addEventListener("targetFound", event => {
-				console.log("ターゲット認識：飛行機の発進を開始");
+				console.log("mystery.mind 認識：画像表示＆飛行機アニメーション開始");
 				isTracking = true;
-				flightOverlay.classList.add("active");
+				
+				// 1. mystery.png を表示し、ポコっと拡大するアニメーションを発火
+				mysteryPlane.setAttribute("visible", "true");
+				mysteryPlane.setAttribute("scale", "0.1 0.1 0.1");
+				setTimeout(() => {
+					mysteryPlane.emit("animateIn");
+				}, 50);
 
-				// 初回即座に飛ばす
+				// 2. 飛行機アニメーション開始
+				flightOverlay.classList.add("active");
 				launchFlight();
 
-				// 一定時間（例: 3.5秒ごと）に何度も繰り返し飛ばす
 				if (!flightInterval) {
 					flightInterval = setInterval(() => {
 						launchFlight();
-					}, 1000);
+					}, 3500);
 				}
 			});
 
@@ -162,10 +187,14 @@
 			targetEntity.addEventListener("targetLost", event => {
 				console.log("ターゲットを見失いました");
 				isTracking = false;
+				
+				// mystery.png を非表示
+				mysteryPlane.setAttribute("visible", "false");
+
+				// 飛行機アニメーション停止
 				flightOverlay.classList.remove("active");
 				flightOverlay.classList.remove("is-animating");
 
-				// タイマーをクリア
 				if (flightInterval) {
 					clearInterval(flightInterval);
 					flightInterval = null;
