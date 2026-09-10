@@ -7,9 +7,6 @@
 	<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 	<!-- MindAR for A-Frame v1.2.5 -->
 	<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-	<!-- A-Frame Particle System Component (紙吹雪や雪を表現するライブラリ) -->
-	<script src="https://unpkg.com/aframe-particle-system-component@1.1.x/dist/aframe-particle-system-component.min.js"></script>
-	
 	<style>
 		body {
 			margin: 0;
@@ -26,59 +23,55 @@
 		vr-mode-ui="enabled: false"
 		device-orientation-permission-ui="enabled: false">
 
+		<a-assets>
+			<img id="site-icon" src="./top.png" />
+		</a-assets>
+
 		<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
 		<!-- ターゲット認識用コンテナ -->
 		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
 			
 			<!-- シネマティック演出グループ -->
-			<a-entity id="cinematic-root" visible="false" position="0 0 0.5" scale="0.01 0.01 0.01"
-				animation__scale="property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 1200; easing: easeOutBack; startEvents: playAnimation;"
-				animation__move="property: position; from: 0 0 0.5; to: 0 0 0.1; dur: 1200; easing: easeOutCubic; startEvents: playAnimation;"
-				animation__float="property: position; from: 0 0 0.1; to: 0 0.08 0.15; dir: alternate; loop: true; dur: 3000; easing: easeInOutSine; startEvents: startFloating;">
+			<a-entity id="cinematic-root" visible="false" scale="0.1 0.1 0.1"
+				animation__scale="property: scale; from: 0.1 0.1 0.1; to: 1 1 1; dur: 2000; easing: easeOutExpo; startEvents: playAnimation;"
+				animation__float="property: position; from: 0 0 0.1; to: 0 0.15 0.2; dir: alternate; loop: true; dur: 4000; easing: easeInOutSine; startEvents: playAnimation;">
 
 				<!-- ① ホームページのブルーを意識した背景パネル -->
 				<a-plane 
-					width="2.2" height="1.0" position="0 0 0" 
-					material="shader: flat; color: #1a365d; opacity: 0.9; transparent: true;">
+					width="1.8" height="0.9" position="0 0 0" 
+					material="shader: flat; color: #1a365d; opacity: 0.85; transparent: true;"
+					animation__fade="property: material.opacity; from: 0; to: 0.85; dur: 1000; startEvents: playAnimation;">
 				</a-plane>
 
-				<!-- ② メインブランド名（MONOTRIP） -->
-				<a-text
-					value="MONOTRIP"
-					align="center"
-					color="#ffffff"
-					width="4.0"
-					position="0 0.2 0.02">
-				</a-text>
+				<!-- ② メインのロゴ画像（top.png） -->
+				<a-plane
+					src="#site-icon"
+					transparent="true"
+					width="1.5"
+					height="0.3"
+					position="0 0.2 0.02"
+					material="shader: flat; opacity: 0;"
+					animation__appear="property: material.opacity; from: 0; to: 1; dur: 1200; delay: 300; startEvents: playAnimation;">
+				</a-plane>
 
-				<!-- ③ スローガン：「Discover the extraordinary」 -->
+				<!-- ③ スローガン：「Discover the extraordinary」を確実に表示するサブパネル/テキスト -->
 				<a-text
 					value="Discover the extraordinary"
 					align="center"
 					color="#ffffff"
 					width="2.2"
-					position="0 -0.1 0.02">
+					position="0 -0.15 0.02"
+					material="shader: flat; opacity: 0;"
+					animation__text="property: text.opacity; from: 0; to: 1; dur: 1200; delay: 600; startEvents: playAnimation;">
 				</a-text>
 
 				<!-- ④ スタイリッシュな下部の光のライン -->
 				<a-plane
-					width="1.8" height="0.015" position="0 -0.3 0.02"
-					material="shader: flat; color: #ffffff;">
+					width="0" height="0.015" position="0 -0.3 0.02"
+					material="shader: flat; color: #ffffff;"
+					animation__line="property: width; from: 0; to: 1.4; dur: 1500; delay: 900; easing: easeOutExpo; startEvents: playAnimation;">
 				</a-plane>
-
-				<!-- ⑤ 紙吹雪（パーティクルシステム） -->
-				<!-- color: 白、ホームページのブルー、アクセントのゴールド -->
-				<a-entity id="confetti-effect"
-					position="0 1 0"
-					particle-system="preset: snow; 
-					                 color: #ffffff, #1a365d, #ffd700; 
-									 particleCount: 70; 
-									 maxAge: 2.5; 
-									 accelerationValue: 0 -0.8 0; 
-									 velocityValue: 0 0.3 0; 
-									 particleSize: 0.8;">
-				</a-entity>
 
 			</a-entity>
 		</a-entity>
@@ -90,19 +83,13 @@
 			const cinematicRoot = document.querySelector("#cinematic-root");
 
 			targetEntity.addEventListener("targetFound", event => {
-				console.log("ターゲットを認識：アニメーション＆紙吹雪開始");
-				
+				console.log("シネマティック演出スタート");
 				cinematicRoot.setAttribute("visible", "true");
-				cinematicRoot.setAttribute("scale", "0.01 0.01 0.01");
-				cinematicRoot.setAttribute("position", "0 0 0.5");
+				cinematicRoot.setAttribute("scale", "0.1 0.1 0.1");
 				
 				setTimeout(() => {
 					cinematicRoot.emit("playAnimation");
 				}, 50);
-
-				setTimeout(() => {
-					cinematicRoot.emit("startFloating");
-				}, 1250);
 			});
 
 			targetEntity.addEventListener("targetLost", event => {
