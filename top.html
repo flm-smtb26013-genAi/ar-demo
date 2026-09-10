@@ -13,6 +13,22 @@
 			overflow: hidden;
 		}
 
+		/* 動作確認用のデバッグ表示 */
+		#debug-status {
+			position: fixed;
+			top: 10px;
+			left: 50%;
+			transform: translateX(-50%);
+			background: rgba(0, 0, 0, 0.7);
+			color: #fff;
+			padding: 6px 16px;
+			border-radius: 20px;
+			font-size: 14px;
+			z-index: 100;
+			pointer-events: none;
+			font-family: sans-serif;
+		}
+
 		/* 全画面SVGフライトステージ */
 		.flight-svg-container {
 			position: absolute;
@@ -80,6 +96,9 @@
 </head>
 
 <body>
+	<!-- ステータス確認用表示 -->
+	<div id="debug-status">マーカーを探索中...</div>
+
 	<!-- A-Scene (top.mind をターゲットに指定) -->
 	<a-scene
 		mindar-image="imageTargetSrc: ./top.mind; maxTrack: 1;"
@@ -89,7 +108,11 @@
 		device-orientation-permission-ui="enabled: false">
 
 		<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-		<a-entity id="ar-target" mindar-image-target="targetIndex: 0"></a-entity>
+		
+		<!-- ターゲット認識用コンテナ（空だと認識イベントが発火しない環境対策として透明なplaneを配置） -->
+		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
+			<a-plane visible="false" width="1" height="1"></a-plane>
+		</a-entity>
 	</a-scene>
 
 	<!-- 飛行機と軌跡専用のSVGオーバーレイレイヤー -->
@@ -106,22 +129,22 @@
 		</svg>
 	</div>
 
-    <script>
+	<script>
 		document.addEventListener("DOMContentLoaded", function() {
 			const targetEntity = document.querySelector("#ar-target");
 			const flightOverlay = document.getElementById("flight-overlay");
 			const flightPath = document.getElementById("flight-path");
 			const flightPlane = document.getElementById("flight-plane");
+			const debugStatus = document.getElementById("debug-status");
 
 			let isTracking = false;
 			let flightInterval = null;
 
-			// ランダムな飛行ルートのパターン定義
 			const routes = [
-				{ path: "M -120,1180 Q 960,980 2050,-120", rotate: "auto 90deg" }, // 左下 ⇒ 右上
-				{ path: "M 2050,1180 Q 960,980 -120,-120", rotate: "auto -90deg" }, // 右下 ⇒ 左上
-				{ path: "M -120,-120 Q 960,200 2050,1180", rotate: "auto 90deg" }, // 左上 ⇒ 右下
-				{ path: "M 1000,-120 Q 500,600 100,1180",  rotate: "auto 180deg" } // 上 ⇒ 下
+				{ path: "M -120,1180 Q 960,980 2050,-120", rotate: "auto 90deg" },
+				{ path: "M 2050,1180 Q 960,980 -120,-120", rotate: "auto -90deg" },
+				{ path: "M -120,-120 Q 960,200 2050,1180", rotate: "auto 90deg" },
+				{ path: "M 1000,-120 Q 500,600 100,1180",  rotate: "auto 180deg" }
 			];
 
 			function launchFlight() {
@@ -134,13 +157,14 @@
 				flightPlane.style.offsetRotate = randomRoute.rotate;
 
 				flightOverlay.classList.remove("is-animating");
-				void flightOverlay.offsetWidth; // DOMリフロー強制
+				void flightOverlay.offsetWidth;
 				flightOverlay.classList.add("is-animating");
 			}
 
-			// ターゲットを認識したとき
 			targetEntity.addEventListener("targetFound", event => {
 				console.log("top.mind 認識：飛行機の発進を開始");
+				debugStatus.textContent = "認識成功：飛行中！";
+				debugStatus.style.background = "rgba(0, 128, 0, 0.8)";
 				isTracking = true;
 				flightOverlay.classList.add("active");
 
@@ -153,9 +177,10 @@
 				}
 			});
 
-			// ターゲットを見失ったとき
 			targetEntity.addEventListener("targetLost", event => {
 				console.log("ターゲットを見失いました");
+				debugStatus.textContent = "マーカーを探索中...";
+				debugStatus.style.background = "rgba(0, 0, 0, 0.7)";
 				isTracking = false;
 				flightOverlay.classList.remove("active");
 				flightOverlay.classList.remove("is-animating");
