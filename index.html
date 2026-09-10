@@ -12,10 +12,71 @@
 			margin: 0;
 			overflow: hidden;
 		}
+
+		/* SVGフライトアニメーション用スタイル（ご提示いただいたアニメーションをベースに統合） */
+		.flight-svg-container {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			pointer-events: none;
+			z-index: 10;
+		}
+
+		.flight-svg-container svg {
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		.contrail {
+			fill: none;
+			stroke: #F0F3FA;
+			stroke-width: 5px;
+			stroke-linecap: round;
+			stroke-dasharray: 2000;
+			stroke-dashoffset: 2000;
+			opacity: 0;
+		}
+
+		.is-animating .contrail {
+			animation: drawContrail 2.2s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+		}
+
+		.plane-group {
+			offset-path: path("M 100,850 Q 960,600 1820,150");
+			offset-rotate: auto 90deg;
+			opacity: 0;
+		}
+
+		.is-animating .plane-group {
+			animation: flyPlane 2.2s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+		}
+
+		.plane-icon {
+			fill: #F0F3FA;
+			filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+		}
+
+		@keyframes flyPlane {
+			0% { offset-distance: 0%; opacity: 0; }
+			5% { opacity: 1; }
+			90% { opacity: 1; }
+			100% { offset-distance: 100%; opacity: 0; }
+		}
+
+		@keyframes drawContrail {
+			0% { stroke-dashoffset: 2000; opacity: 0; }
+			10% { opacity: 0.9; }
+			85% { opacity: 0.9; }
+			100% { stroke-dashoffset: 0; opacity: 0; }
+		}
 	</style>
 </head>
 
 <body>
+	<!-- A-Frameシーン -->
 	<a-scene
 		mindar-image="imageTargetSrc: ./top.mind; maxTrack: 1;"
 		color-space="sRGB"
@@ -28,71 +89,63 @@
 		<!-- ターゲット認識用コンテナ -->
 		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
 			
-			<!-- シネマティック演出グループ -->
-			<a-entity id="cinematic-root" visible="false" scale="1 1 1">
-
-				<!-- ① 飛行機の軌跡（左下から右上へ伸びるライン） -->
-				<a-plane
-					id="flight-path"
-					width="0" height="0.012" 
-					position="-0.4 -0.3 0" 
-					rotation="0 0 30"
-					material="shader: flat; color: #1a365d; opacity: 0.5; transparent: true;"
-					animation__path="property: width; from: 0; to: 1.6; dur: 1500; easing: easeOutExpo; startEvents: playAnimation;">
-				</a-plane>
-
-				<!-- ② 本格的な飛行機モデル（胴体、主翼、尾翼を組み合わせた立体構造） -->
-				<a-entity id="airplane-model"
-					position="-0.7 -0.4 0.02"
-					rotation="0 0 30"
-					animation__fly="property: position; from: -0.7 -0.4 0.02; to: 0.7 0.35 0.05; dur: 2000; easing: easeOutCubic; startEvents: playAnimation;"
-					animation__scale="property: scale; from: 0.6 0.6 0.6; to: 1.1 1.1 1.1; dur: 2000; easing: easeOutExpo; startEvents: playAnimation;">
-
-					<!-- 胴体 (Fuselage) -->
-					<a-box width="0.4" height="0.08" depth="0.08" position="0 0 0" material="shader: flat; color: #1a365d;"></a-box>
-					<!-- 機首（ノーズ） -->
-					<a-cone radius-bottom="0.04" height="0.12" position="0.22 0 0" rotation="0 0 -90" material="shader: flat; color: #1a365d;"></a-cone>
-					<!-- 主翼 (Main Wings) -->
-					<a-box width="0.12" height="0.015" depth="0.55" position="0.02 0 0" material="shader: flat; color: #1a365d;"></a-box>
-					<!-- 尾翼・垂直尾翼 (Tail Fin) -->
-					<a-box width="0.08" height="0.08" depth="0.015" position="-0.18 0.05 0" rotation="0 0 -30" material="shader: flat; color: #1a365d;"></a-box>
-					<!-- 水平尾翼 (Horizontal Stabilizer) -->
-					<a-box width="0.08" height="0.012" depth="0.22" position="-0.18 0 0" material="shader: flat; color: #1a365d;"></a-box>
-
-				</a-entity>
-
-				<!-- ③ スローガン（飛行機が飛び去った後に浮かび上がる） -->
-				<a-text
-					value="Discover the extraordinary"
-					align="center"
-					color="#1a365d"
-					width="2.2"
-					position="0 -0.2 0.02"
-					material="shader: flat; opacity: 0;"
-					animation__text="property: text.opacity; from: 0; to: 1; dur: 1200; delay: 1200; startEvents: playAnimation;">
-				</a-text>
-
+			<!-- マーカー上に浮かび上がるMONOTRIPロゴ・テキスト -->
+			<a-entity id="ar-content" visible="false" position="0 0 0.1">
+				<!-- 背景パネル（深みのあるブルー #224571） -->
+				<a-plane width="2.0" height="0.9" material="shader: flat; color: #224571; opacity: 0.9; transparent: true;"></a-plane>
+				
+				<!-- ブランド名 -->
+				<a-text value="MONOTRIP" align="center" color="#F0F3FA" width="4.0" position="0 0.2 0.02"></a-text>
+				
+				<!-- スローガン -->
+				<a-text value="Discover the extraordinary" align="center" color="#F0F3FA" width="2.2" position="0 -0.1 0.02"></a-text>
+				
+				<!-- 下部ライン -->
+				<a-plane width="1.6" height="0.015" position="0 -0.28 0.02" material="shader: flat; color: #F0F3FA;"></a-plane>
 			</a-entity>
+
 		</a-entity>
 	</a-scene>
+
+	<!-- 画面全体（スマホのビューポート）を覆うフライトSVGレイヤー -->
+	<div id="flight-overlay" class="flight-svg-container">
+		<svg viewBox="0 0 1920 1080" preserveAspectRatio="none">
+			<!-- 飛行機雲の軌跡 -->
+			<path class="contrail" d="M 100,850 Q 960,600 1820,150" pathLength="2000" />
+			<!-- 飛行機アイコン -->
+			<g class="plane-group">
+				<g transform="scale(3.5) translate(-12, -21)">
+					<path class="plane-icon" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+				</g>
+			</g>
+		</svg>
+	</div>
 
 	<script>
 		document.addEventListener("DOMContentLoaded", function() {
 			const targetEntity = document.querySelector("#ar-target");
-			const cinematicRoot = document.querySelector("#cinematic-root");
+			const arContent = document.querySelector("#ar-content");
+			const flightOverlay = document.getElementById("flight-overlay");
+
+			let hasPlayed = false;
 
 			targetEntity.addEventListener("targetFound", event => {
-				console.log("本格フライト演出スタート");
-				cinematicRoot.setAttribute("visible", "true");
+				console.log("ターゲットを認識しました！");
 				
-				setTimeout(() => {
-					cinematicRoot.emit("playAnimation");
-				}, 50);
+				// 1. ARコンテンツ（MONOTRIPのパネル）を表示
+				arContent.setAttribute("visible", "true");
+
+				// 2. 飛行機アニメーションがまだ再生されていなければ発火
+				if (!hasPlayed) {
+					hasPlayed = true;
+					flightOverlay.classList.add("is-animating");
+				}
 			});
 
 			targetEntity.addEventListener("targetLost", event => {
 				console.log("ターゲットを見失いました");
-				cinematicRoot.setAttribute("visible", "false");
+				// マーカーを見失ったらパネルを非表示にする
+				arContent.setAttribute("visible", "false");
 			});
 		});
 	</script>
