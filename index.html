@@ -63,6 +63,26 @@
 			filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 		}
 
+		/* 追加：旅のモチーフ（ホテル・ロケーション・星など）がふんわり浮かぶスタイル */
+		.travel-element {
+			position: absolute;
+			color: #F0F3FA;
+			font-family: sans-serif;
+			font-weight: bold;
+			font-size: 14px;
+			letter-spacing: 2px;
+			padding: 6px 14px;
+			background: rgba(26, 54, 93, 0.75);
+			border: 1px solid rgba(240, 243, 250, 0.4);
+			border-radius: 20px;
+			backdrop-filter: blur(4px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			opacity: 0;
+			pointer-events: none;
+			transform: scale(0.8);
+			animation: floatTravelElement 2.5s ease-out forwards;
+		}
+
 		@keyframes flyPlane {
 			0% { offset-distance: 0%; opacity: 0; }
 			5% { opacity: 1; }
@@ -76,11 +96,30 @@
 			85% { opacity: 0.9; }
 			100% { stroke-dashoffset: 0; opacity: 0; }
 		}
+
+		@keyframes floatTravelElement {
+			0% {
+				opacity: 0;
+				transform: translateY(20px) scale(0.8);
+			}
+			30% {
+				opacity: 1;
+				transform: translateY(0px) scale(1);
+			}
+			80% {
+				opacity: 1;
+				transform: translateY(-15px) scale(1);
+			}
+			100% {
+				opacity: 0;
+				transform: translateY(-30px) scale(0.9);
+			}
+		}
 	</style>
 </head>
 
 <body>
-	<!-- A-Scene (ARマーカー認識のみに使用し、中身の3D要素はなし) -->
+	<!-- A-Scene (ARマーカー認識のみに使用) -->
 	<a-scene
 		mindar-image="imageTargetSrc: ./top.mind; maxTrack: 1;"
 		color-space="sRGB"
@@ -92,7 +131,7 @@
 		<a-entity id="ar-target" mindar-image-target="targetIndex: 0"></a-entity>
 	</a-scene>
 
-	<!-- 飛行機と軌跡専用のSVGオーバーレイレイヤー -->
+	<!-- 飛行機と軌跡、旅のアニメーション専用のオーバーレイレイヤー -->
 	<div id="flight-overlay" class="flight-svg-container">
 		<svg viewBox="0 0 1920 1080" preserveAspectRatio="none">
 			<!-- 飛行機雲の軌跡 -->
@@ -104,6 +143,8 @@
 				</g>
 			</g>
 		</svg>
+		<!-- 旅のワードが動的に湧き出るコンテナ -->
+		<div id="travel-elements-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;"></div>
 	</div>
 
     <script>
@@ -112,17 +153,45 @@
 			const flightOverlay = document.getElementById("flight-overlay");
 			const flightPath = document.getElementById("flight-path");
 			const flightPlane = document.getElementById("flight-plane");
+			const travelLayer = document.getElementById("travel-elements-layer");
 
 			let isTracking = false;
 			let flightInterval = null;
 
-			// ランダムな飛行ルートのパターン定義（左下→右上、右下→左上、左上→右下など）
+			// ランダムな飛行ルートのパターン定義
 			const routes = [
-				{ path: "M -120,1180 Q 960,980 2050,-120", rotate: "auto 90deg" }, // 左下 ⇒ 右上
-				{ path: "M 2050,1180 Q 960,980 -120,-120", rotate: "auto -90deg" }, // 右下 ⇒ 左上
-				{ path: "M -120,-120 Q 960,200 2050,1180", rotate: "auto 90deg" }, // 左上 ⇒ 右下
-				{ path: "M 1000,-120 Q 500,600 100,1180",  rotate: "auto 180deg" } // 上 ⇒ 下
+				{ path: "M -120,1180 Q 960,980 2050,-120", rotate: "auto 90deg" },
+				{ path: "M 2050,1180 Q 960,980 -120,-120", rotate: "auto -90deg" },
+				{ path: "M -120,-120 Q 960,200 2050,1180", rotate: "auto 90deg" },
+				{ path: "M 1000,-120 Q 500,600 100,1180",  rotate: "auto 180deg" }
 			];
+
+			// 旅行にちなんだ浮かび上がらせるテキストやタグの候補
+			const travelKeywords = [
+				"✈️ HOTEL", "🌴 RESORT", "✨ MONOTRIP", "📸 MEMORIES", 
+				"🗺️ ADVENTURE", "🌟 SPECIAL PRICE", "🏖️ VACATION", "🚅 TOUR"
+			];
+
+			function spawnTravelElement() {
+				if (!isTracking) return;
+
+				const el = document.createElement("div");
+				el.className = "travel-element";
+				el.innerText = travelKeywords[Math.floor(Math.random() * travelKeywords.length)];
+
+				// 画面内のランダムな位置に配置
+				const randomX = Math.random() * 70 + 15; // 15% 〜 85%
+				const randomY = Math.random() * 60 + 20; // 20% 〜 80%
+				el.style.left = `${randomX}%`;
+				el.style.top = `${randomY}%`;
+
+				travelLayer.appendChild(el);
+
+				// アニメーション終了後にDOMから削除
+				setTimeout(() => {
+					el.remove();
+				}, 2500);
+			}
 
 			function launchFlight() {
 				if (!isTracking) return;
@@ -135,22 +204,24 @@
 				flightPlane.style.offsetPath = `path("${randomRoute.path}")`;
 				flightPlane.style.offsetRotate = randomRoute.rotate;
 
-				// アニメーションクラスを一度外して再付与（毎回リセットして再発火させるため）
+				// アニメーションクラスを一度外して再付与
 				flightOverlay.classList.remove("is-animating");
-				void flightOverlay.offsetWidth; // DOMリフロー強制
+				void flightOverlay.offsetWidth; 
 				flightOverlay.classList.add("is-animating");
+
+				// 飛行機の飛び出しに合わせて旅行ワードをいくつかポップアップさせる
+				setTimeout(spawnTravelElement, 400);
+				setTimeout(spawnTravelElement, 1100);
 			}
 
 			// ターゲットを認識したとき
 			targetEntity.addEventListener("targetFound", event => {
-				console.log("ターゲット認識：飛行機の発進を開始");
+				console.log("ターゲット認識：飛行機と旅行アニメーションを開始");
 				isTracking = true;
 				flightOverlay.classList.add("active");
 
-				// 初回即座に飛ばす
 				launchFlight();
 
-				// 一定時間（例: 3.5秒ごと）に何度も繰り返し飛ばす
 				if (!flightInterval) {
 					flightInterval = setInterval(() => {
 						launchFlight();
@@ -164,8 +235,8 @@
 				isTracking = false;
 				flightOverlay.classList.remove("active");
 				flightOverlay.classList.remove("is-animating");
+				travelLayer.innerHTML = ""; // 残っている要素をクリア
 
-				// タイマーをクリア
 				if (flightInterval) {
 					clearInterval(flightInterval);
 					flightInterval = null;
