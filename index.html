@@ -7,9 +7,6 @@
 	<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 	<!-- MindAR for A-Frame v1.2.5 -->
 	<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-	<!-- A-Frame Particle System Component (紙吹雪や雪を表現するライブラリ) -->
-	<script src="https://unpkg.com/aframe-particle-system-component@1.1.x/dist/aframe-particle-system-component.min.js"></script>
-	
 	<style>
 		body {
 			margin: 0;
@@ -67,19 +64,6 @@
 					material="shader: flat; color: #ffffff;">
 				</a-plane>
 
-				<!-- ⑤ 紙吹雪（パーティクルシステム） -->
-				<!-- color: 白、ホームページのブルー、アクセントのゴールド -->
-				<a-entity id="confetti-effect"
-					position="0 1 0"
-					particle-system="preset: snow; 
-					                 color: #ffffff, #1a365d, #ffd700; 
-									 particleCount: 70; 
-									 maxAge: 2.5; 
-									 accelerationValue: 0 -0.8 0; 
-									 velocityValue: 0 0.3 0; 
-									 particleSize: 0.8;">
-				</a-entity>
-
 			</a-entity>
 		</a-entity>
 	</a-scene>
@@ -90,7 +74,7 @@
 			const cinematicRoot = document.querySelector("#cinematic-root");
 
 			targetEntity.addEventListener("targetFound", event => {
-				console.log("ターゲットを認識：アニメーション＆紙吹雪開始");
+				console.log("ターゲットを認識：アニメーション開始");
 				
 				cinematicRoot.setAttribute("visible", "true");
 				cinematicRoot.setAttribute("scale", "0.01 0.01 0.01");
