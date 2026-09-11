@@ -16,7 +16,7 @@
 		}
 
 		/* ==========================================
-		   ポップアウト型ローディングUI（画面中央固定）
+		   ポップアウト型ローディングUI
 		   ========================================== */
 		#popout-loader {
 			position: fixed;
@@ -50,14 +50,13 @@
 </head>
 
 <body>
-	<!-- 画面上のローディングUI -->
+	<!-- ローディングUI -->
 	<div id="popout-loader">
 		<div class="loader-title">MONOTRIP</div>
 		<div class="loader-track"><div class="loader-bar"></div></div>
 		<div class="loader-text">Loading Earth...</div>
 	</div>
 
-	<!-- ARシーン：カメラの手ブレを極限まで抑えるフィルター(filterMinCF/filterBeta)を設定 -->
 	<a-scene
 		mindar-image="imageTargetSrc: ./top.mind; maxTrack: 1; filterMinCF: 0.0005; filterBeta: 0.005;"
 		color-space="sRGB"
@@ -65,54 +64,74 @@
 		vr-mode-ui="enabled: false"
 		device-orientation-permission-ui="enabled: false">
 
+		<a-assets>
+			<!-- バグを防ぐためBase64化したペラペラ（2D）の美しい飛行機シルエット -->
+			<img id="plane-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTTIxIDE2di0ybC04LTVWMy41YzAtLjgzLS42Ny0xLjUtMS41LTEuNVMxMCAyLjY3IDEwIDMuNVY5bC04IDV2Mmw4LTIuNVYxOWwtMiAxLjVWMjJsMy41LTEgMy41IDF2LTEuNUwxMyAxOXYtNS41bDggMi41eiIvPjwvc3ZnPg==">
+		</a-assets>
+
 		<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-		<!-- ARマーカーに追従する3D空間 -->
+		<!-- ARターゲット -->
 		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
 			
-			<!-- マーカーの上に浮かび上がるホログラムグループ（初期はスケール0で見えない） -->
-			<a-entity id="hologram-group" position="0 0.2 0" scale="0 0 0" 
+			<a-entity id="hologram-group" position="0 0.1 0" scale="0 0 0" 
 					  animation="property: scale; to: 1 1 1; dur: 1200; easing: easeOutElastic; startEvents: popup;">
 				
-				<!-- 立体感を生むための空間照明 -->
 				<a-light type="directional" position="1 2 1" intensity="1.5" color="#ffffff"></a-light>
 				<a-light type="ambient" intensity="0.5" color="#ffffff"></a-light>
 
 				<!-- ==========================================
-					 1. 3D地球儀（マーカーの真上でゆっくり自転）
+					 1. 地球儀（サイズを元の1/2に縮小）
 					 ========================================== -->
 				<a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear;">
-					<!-- コア（海）：ネイビーの球体 -->
-					<a-sphere radius="0.5" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-sphere>
-					
-					<!-- 経線・緯線のワイヤーフレーム -->
-					<a-sphere radius="0.52" material="color: #ffffff; wireframe: true; transparent: true; opacity: 0.2" segments-width="18" segments-height="12"></a-sphere>
-					
-					<!-- 仮想大陸：幾何学ポリゴンを重ねる -->
-					<a-entity geometry="primitive: icosahedron; detail: 1" scale="0.54 0.54 0.54" material="color: #ffffff; wireframe: true; transparent: true; opacity: 0.6"></a-entity>
+					<!-- コア（半径を 0.5 → 0.25 に） -->
+					<a-sphere radius="0.25" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-sphere>
+					<!-- ワイヤーフレーム -->
+					<a-sphere radius="0.26" material="color: #ffffff; wireframe: true; transparent: true; opacity: 0.2" segments-width="18" segments-height="12"></a-sphere>
+					<!-- 仮想大陸 -->
+					<a-entity geometry="primitive: icosahedron; detail: 1" scale="0.27 0.27 0.27" material="color: #ffffff; wireframe: true; transparent: true; opacity: 0.6"></a-entity>
 				</a-entity>
 
 				<!-- ==========================================
-					 2. 飛行機と軌道（地球の周りを3Dで旋回）
+					 2. 飛行機 1機目（赤道付近を旋回）
 					 ========================================== -->
-				<a-entity animation="property: rotation; to: 360 360 0; loop: true; dur: 5000; easing: linear;">
-					
-					<!-- 旋回軌道上の飛行機グループ（地球から0.75離れた位置） -->
-					<a-entity position="0.75 0 0" rotation="0 90 90">
-						<!-- コードで作る超軽量・ブレゼロのローポリ飛行機（白） -->
-						<!-- 胴体 -->
-						<a-cone radius-bottom="0.03" height="0.15" color="#ffffff" rotation="90 0 0" position="0 0 0"></a-cone>
-						<!-- 主翼 -->
-						<a-box width="0.2" height="0.01" depth="0.04" color="#ffffff" position="0 0 0.02"></a-box>
-						<!-- 尾翼 -->
-						<a-box width="0.06" height="0.03" depth="0.01" color="#ffffff" position="0 0.02 -0.05"></a-box>
+				<a-entity rotation="15 45 0">
+					<!-- うっすらとした軌跡のリング -->
+					<a-ring radius-inner="0.345" radius-outer="0.35" material="color: #ffffff; transparent: true; opacity: 0.2" rotation="-90 0 0"></a-ring>
+					<!-- 回転アニメーション -->
+					<a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 4500; easing: linear;">
+						<!-- 飛行機の配置（進行方向に合わせて寝かせる） -->
+						<a-entity position="0.35 0 0">
+							<a-image src="#plane-icon" width="0.06" height="0.06" rotation="-90 0 0"></a-image>
+						</a-entity>
 					</a-entity>
-					
-					<!-- 飛行機の軌跡（リング） -->
-					<a-ring radius-inner="0.74" radius-outer="0.75" material="color: #ffffff; transparent: true; opacity: 0.3" rotation="90 0 0"></a-ring>
 				</a-entity>
-			</a-entity>
 
+				<!-- ==========================================
+					 3. 飛行機 2機目（斜めの軌道）
+					 ========================================== -->
+				<a-entity rotation="70 -30 0">
+					<a-ring radius-inner="0.395" radius-outer="0.4" material="color: #ffffff; transparent: true; opacity: 0.2" rotation="-90 0 0"></a-ring>
+					<a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 5500; easing: linear;">
+						<a-entity position="0.4 0 0">
+							<a-image src="#plane-icon" width="0.06" height="0.06" rotation="-90 0 0"></a-image>
+						</a-entity>
+					</a-entity>
+				</a-entity>
+
+				<!-- ==========================================
+					 4. 飛行機 3機目（別角度の斜め軌道）
+					 ========================================== -->
+				<a-entity rotation="-45 60 0">
+					<a-ring radius-inner="0.445" radius-outer="0.45" material="color: #ffffff; transparent: true; opacity: 0.2" rotation="-90 0 0"></a-ring>
+					<a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 6500; easing: linear;">
+						<a-entity position="0.45 0 0">
+							<a-image src="#plane-icon" width="0.06" height="0.06" rotation="-90 0 0"></a-image>
+						</a-entity>
+					</a-entity>
+				</a-entity>
+
+			</a-entity>
 		</a-entity>
 	</a-scene>
 
@@ -123,27 +142,18 @@
 			const hologramGroup = document.querySelector("#hologram-group");
 			let loadTimeout = null;
 
-			// マーカー認識時
 			targetEntity.addEventListener("targetFound", () => {
-				// 1. ローディングUIを画面中央に出現させる
 				popoutLoader.classList.add("is-active");
 
-				// 2. 約1.6秒後にロード完了
 				loadTimeout = setTimeout(() => {
-					// ロードUIを消す
 					popoutLoader.classList.remove("is-active");
-					
-					// マーカーの上に3Dホログラムを「ポコッ」と出現させる（popupイベント発火）
 					hologramGroup.emit("popup");
 				}, 1600);
 			});
 
-			// マーカーロスト時
 			targetEntity.addEventListener("targetLost", () => {
 				clearTimeout(loadTimeout);
 				popoutLoader.classList.remove("is-active");
-				
-				// ホログラムのスケールを0に戻して隠す
 				hologramGroup.setAttribute("scale", "0 0 0");
 			});
 		});
