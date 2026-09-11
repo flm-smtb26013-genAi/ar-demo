@@ -35,28 +35,35 @@
 		.loader-text { font-size: 11px; letter-spacing: 2px; opacity: 0.8; }
 
 		/* ==========================================
-		   2. ホログラムロゴUI（HUD）
+		   2. ホログラムロゴUI（すりガラスの座布団付きHUD）
 		   ========================================== */
 		#hologram-logo {
 			position: fixed;
 			top: 50%; left: 50%;
-			width: 300px;
-			/* 中央から少し上に配置し、3Dの奥行きと傾きを持たせる */
+			width: 320px;
+			box-sizing: border-box;
+			padding: 30px 35px 15px; /* 座布団の余白設定 */
+			
+			/* ▼ 追加: すりガラス風の座布団エフェクト ▼ */
+			background: rgba(15, 35, 60, 0.65); /* ブランドカラーに合わせたダークネイビーの半透明 */
+			backdrop-filter: blur(8px); /* 背後の景色や地球儀を美しくぼかす */
+			-webkit-backdrop-filter: blur(8px);
+			border: 1px solid rgba(240, 243, 250, 0.2); /* ガラスのフチの光沢 */
+			border-radius: 24px; /* 丸みのあるパネル */
+			box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.05);
+			/* ▲ ここまで ▲ */
+
 			transform: translate(-50%, -60%) perspective(800px) rotateX(15deg) scale(0.9);
 			z-index: 1000;
 			pointer-events: none;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			/* 初期は非表示 */
 			opacity: 0;
 			visibility: hidden;
 			transition: opacity 0.5s ease;
-			/* ホログラム特有の光彩効果 */
-			filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
 		}
 
-		/* アクティブ時の表示と、ふわふわ浮かぶアニメーション */
 		#hologram-logo.is-playing {
 			opacity: 1;
 			visibility: visible;
@@ -72,40 +79,18 @@
 		.part { opacity: 0; animation-fill-mode: forwards; }
 		.icon-line { fill: none; stroke: #ffffff; stroke-width: 5; stroke-linecap: round; }
 
-		/* --- クラス付与時（.is-playing）のみアニメーションを発火 --- */
 		.is-playing .mountain { animation: fadeUp 1.5s ease-out 0s forwards; }
-		.is-playing .hammer {
-			transform-origin: 330px 500px;
-			animation: strikeDown 0.7s cubic-bezier(0.17, 0.89, 0.32, 1.5) 1.2s forwards;
-		}
-		.is-playing .compass {
-			transform-origin: 287px 267px;
-			animation: spinIn 2s cubic-bezier(0.25, 1, 0.5, 1) 1s forwards;
-		}
+		.is-playing .hammer { transform-origin: 330px 500px; animation: strikeDown 0.7s cubic-bezier(0.17, 0.89, 0.32, 1.5) 1.2s forwards; }
+		.is-playing .compass { transform-origin: 287px 267px; animation: spinIn 2s cubic-bezier(0.25, 1, 0.5, 1) 1s forwards; }
 		.is-playing .m-base { animation: fadeIn 1s ease-in-out 2s forwards; }
-		.is-playing .comet {
-			fill: #2eb896; stroke: none; transform-origin: 287px 283px;
-			animation: meteorStrike 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) 2.5s forwards;
-		}
-		.is-playing .logo-text {
-			margin-top: 10px; color: #ffffff; font-size: 28px; font-weight: bold;
-			letter-spacing: 5px; opacity: 0;
-			animation: fadeIn 1s ease-in-out 4s forwards;
-		}
+		.is-playing .comet { fill: #2eb896; stroke: none; transform-origin: 287px 283px; animation: meteorStrike 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) 2.5s forwards; }
+		.is-playing .logo-text { margin-top: 10px; color: #ffffff; font-size: 28px; font-weight: bold; letter-spacing: 5px; opacity: 0; animation: fadeIn 1s ease-in-out 4s forwards; }
 
 		@keyframes fadeUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
-		@keyframes strikeDown {
-			0% { opacity: 0; transform: rotate(60deg) translate(50px, -50px); }
-			30% { opacity: 1; }
-			100% { opacity: 1; transform: rotate(0deg) translate(0, 0); }
-		}
+		@keyframes strikeDown { 0% { opacity: 0; transform: rotate(60deg) translate(50px, -50px); } 30% { opacity: 1; } 100% { opacity: 1; transform: rotate(0deg) translate(0, 0); } }
 		@keyframes spinIn { 0% { opacity: 0; transform: rotate(-180deg) scale(0.8); } 100% { opacity: 1; transform: rotate(0deg) scale(1); } }
 		@keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
-		@keyframes meteorStrike {
-			0% { opacity: 0; transform: translate(600px, -600px) scale(2); }
-			40% { opacity: 1; }
-			100% { opacity: 1; transform: translate(0, 0) scale(1); }
-		}
+		@keyframes meteorStrike { 0% { opacity: 0; transform: translate(600px, -600px) scale(2); } 40% { opacity: 1; } 100% { opacity: 1; transform: translate(0, 0) scale(1); } }
 	</style>
 </head>
 
@@ -117,7 +102,7 @@
 		<div class="loader-text">Loading Earth...</div>
 	</div>
 
-	<!-- 2. ホログラムロゴ（ロード後に発火） -->
+	<!-- 2. ホログラムロゴ（座布団付き） -->
 	<div id="hologram-logo">
 		<svg class="animated-logo" width="574" height="534" viewBox="0 0 574 534" xmlns="http://www.w3.org/2000/svg">
 			<path class="part compass icon-line" d="M98.01 283.996L60.5557 299.526C59.9688 299.769 59.1382 300.473 58.9865 301.09C57.9596 305.265 56.3872 321.928 69.9166 363.498C106.023 447.907 179.558 508.082 286.417 515.498C351.753 512.643 382.365 498.491 397.417 488.998L410.078 480.557C410.54 480.249 411.165 480.377 411.469 480.841L419.769 493.509C420.108 494.027 419.921 494.716 419.36 494.977C402.715 502.748 358.475 532.693 274.917 530.998C130.001 515.476 61.6854 428.703 38.5105 300.519C38.452 300.195 38.2377 299.917 37.9381 299.781L3.08716 283.982C2.27976 283.616 2.31257 282.458 3.1394 282.139L37.8716 268.709C38.2083 268.579 38.4492 268.273 38.5014 267.916C47.302 207.735 63.3156 164.506 96.9807 129.498C145.38 72.0666 201.803 41.3118 272.272 36.5411C272.663 36.5146 273.006 36.2635 273.145 35.8977L285.6 3.14466C285.911 2.32806 287.046 2.27435 287.432 3.05796L303.67 35.9983C303.823 36.3091 304.134 36.519 304.479 36.5524C354.529 41.3995 380.892 48.5188 420.409 75.3125C420.927 75.6641 421.007 76.4081 420.564 76.8512L409.5 87.9143C409.162 88.2533 408.623 88.2991 408.225 88.0312C375.183 65.7622 352.698 57.8708 304.641 55.0403C304.214 55.0152 303.808 55.2645 303.647 55.6607L287.464 95.4237C287.111 96.2919 285.865 96.2406 285.584 95.3463L273.149 55.7373C273.012 55.3022 272.594 55.0147 272.138 55.0395C201.749 58.8723 148.434 88.5535 107.564 140.498C78.2145 172.417 65.206 212.314 59.4971 267.711C59.4498 268.17 59.7226 268.606 60.1574 268.76L97.9604 282.13C98.8243 282.435 98.8565 283.645 98.01 283.996Z" />
