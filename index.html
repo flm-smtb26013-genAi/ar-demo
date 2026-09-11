@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<!-- A-Frame v1.5.0 (Three.jsを内包) -->
+	<!-- A-Frame v1.5.0 -->
 	<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 	<!-- MindAR for A-Frame v1.2.5 -->
 	<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -16,7 +16,7 @@
 		}
 
 		/* ==========================================
-		   ポップアウト型ローディングUI
+		   ポップアウト型ローディングUI（画面中央固定）
 		   ========================================== */
 		#popout-loader {
 			position: fixed;
@@ -41,296 +41,110 @@
 			opacity: 1;
 		}
 
-		.loader-title {
-			font-size: 26px;
-			font-weight: 800;
-			letter-spacing: 4px;
-			margin-bottom: 15px;
-		}
-
-		.loader-track {
-			width: 100%;
-			height: 3px;
-			background: rgba(255, 255, 255, 0.2);
-			border-radius: 2px;
-			overflow: hidden;
-			position: relative;
-			margin-bottom: 10px;
-		}
-
-		.loader-bar {
-			position: absolute;
-			top: 0; left: 0;
-			height: 100%; width: 0;
-			background: #F0F3FA;
-			transition: width 1.5s cubic-bezier(0.65, 0, 0.35, 1);
-		}
-
-		#popout-loader.is-active .loader-bar {
-			width: 100%;
-		}
-
-		.loader-text {
-			font-size: 11px;
-			letter-spacing: 2px;
-			opacity: 0.8;
-		}
-
-		/* ==========================================
-		   AR演出オーバーレイ（地球儀 ＆ 飛行機）
-		   ========================================== */
-		.ar-overlay-container {
-			position: absolute;
-			top: 0; left: 0; width: 100vw; height: 100vh;
-			pointer-events: none;
-			z-index: 10;
-			display: none;
-			overflow: hidden;
-		}
-
-		.ar-overlay-container.active {
-			display: block;
-			animation: fadeInAR 1s ease forwards;
-		}
-
-		@keyframes fadeInAR {
-			from { opacity: 0; }
-			to { opacity: 1; }
-		}
-
-		/* --- Three.jsを描画するキャンバス用コンテナ --- */
-		#globe-3d {
-			position: absolute;
-			top: 50%; left: 50%;
-			transform: translate(-50%, -50%);
-			width: 280px; height: 280px;
-			z-index: 1;
-			/* キャンバス自体にふんわりとした影をつけて空間に浮かせる */
-			filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.4));
-		}
-
-		/* --- 飛行機 ＆ 軌跡 --- */
-		svg {
-			position: absolute;
-			top: 0; left: 0;
-			width: 100%; height: 100%;
-			z-index: 2; 
-		}
-
-		.contrail {
-			fill: none;
-			stroke: #ffffff;
-			stroke-width: 4px;
-			stroke-linecap: round;
-			stroke-dasharray: 2500;
-			stroke-dashoffset: 2500;
-			opacity: 0;
-			filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
-		}
-
-		.plane-group { 
-			opacity: 0; 
-			offset-rotate: auto 90deg; 
-		}
-
-		.is-animating .contrail { animation: drawContrail 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-		.is-animating .plane-group { animation: flyPlane 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-
-		.plane-icon {
-			fill: #ffffff;
-			filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-		}
-
-		@keyframes flyPlane {
-			0% { offset-distance: 0%; opacity: 0; transform: scale(1.2); }
-			10% { opacity: 1; }
-			90% { opacity: 1; }
-			100% { offset-distance: 100%; opacity: 0; }
-		}
-
-		@keyframes drawContrail {
-			0% { stroke-dashoffset: 2500; opacity: 0; }
-			15% { opacity: 1; }
-			85% { opacity: 1; }
-			100% { stroke-dashoffset: 0; opacity: 0; }
-		}
+		.loader-title { font-size: 26px; font-weight: 800; letter-spacing: 4px; margin-bottom: 15px; }
+		.loader-track { width: 100%; height: 3px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; overflow: hidden; position: relative; margin-bottom: 10px; }
+		.loader-bar { position: absolute; top: 0; left: 0; height: 100%; width: 0; background: #F0F3FA; transition: width 1.5s cubic-bezier(0.65, 0, 0.35, 1); }
+		#popout-loader.is-active .loader-bar { width: 100%; }
+		.loader-text { font-size: 11px; letter-spacing: 2px; opacity: 0.8; }
 	</style>
 </head>
 
 <body>
-	<!-- ポップアウト型 ローディングUI -->
+	<!-- 画面上のローディングUI -->
 	<div id="popout-loader">
 		<div class="loader-title">MONOTRIP</div>
-		<div class="loader-track">
-			<div class="loader-bar"></div>
-		</div>
+		<div class="loader-track"><div class="loader-bar"></div></div>
 		<div class="loader-text">Loading Earth...</div>
 	</div>
 
-	<!-- ARカメラシーン -->
+	<!-- ARシーン：カメラの手ブレを極限まで抑えるフィルター(filterMinCF/filterBeta)を設定 -->
 	<a-scene
-		mindar-image="imageTargetSrc: ./top.mind; maxTrack: 1;"
+		mindar-image="imageTargetSrc: ./top.mind; maxTrack: 1; filterMinCF: 0.0005; filterBeta: 0.005;"
 		color-space="sRGB"
 		renderer="colorManagement: true, physicallyCorrectLights"
 		vr-mode-ui="enabled: false"
 		device-orientation-permission-ui="enabled: false">
+
 		<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-		<a-entity id="ar-target" mindar-image-target="targetIndex: 0"></a-entity>
+
+		<!-- ARマーカーに追従する3D空間 -->
+		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
+			
+			<!-- マーカーの上に浮かび上がるホログラムグループ（初期はスケール0で見えない） -->
+			<a-entity id="hologram-group" position="0 0.2 0" scale="0 0 0" 
+					  animation="property: scale; to: 1 1 1; dur: 1200; easing: easeOutElastic; startEvents: popup;">
+				
+				<!-- 立体感を生むための空間照明 -->
+				<a-light type="directional" position="1 2 1" intensity="1.5" color="#ffffff"></a-light>
+				<a-light type="ambient" intensity="0.5" color="#ffffff"></a-light>
+
+				<!-- ==========================================
+					 1. 3D地球儀（マーカーの真上でゆっくり自転）
+					 ========================================== -->
+				<a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear;">
+					<!-- コア（海）：ネイビーの球体 -->
+					<a-sphere radius="0.5" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-sphere>
+					
+					<!-- 経線・緯線のワイヤーフレーム -->
+					<a-sphere radius="0.52" material="color: #ffffff; wireframe: true; transparent: true; opacity: 0.2" segments-width="18" segments-height="12"></a-sphere>
+					
+					<!-- 仮想大陸：幾何学ポリゴンを重ねる -->
+					<a-entity geometry="primitive: icosahedron; detail: 1" scale="0.54 0.54 0.54" material="color: #ffffff; wireframe: true; transparent: true; opacity: 0.6"></a-entity>
+				</a-entity>
+
+				<!-- ==========================================
+					 2. 飛行機と軌道（地球の周りを3Dで旋回）
+					 ========================================== -->
+				<a-entity animation="property: rotation; to: 360 360 0; loop: true; dur: 5000; easing: linear;">
+					
+					<!-- 旋回軌道上の飛行機グループ（地球から0.75離れた位置） -->
+					<a-entity position="0.75 0 0" rotation="0 90 90">
+						<!-- コードで作る超軽量・ブレゼロのローポリ飛行機（白） -->
+						<!-- 胴体 -->
+						<a-cone radius-bottom="0.03" height="0.15" color="#ffffff" rotation="90 0 0" position="0 0 0"></a-cone>
+						<!-- 主翼 -->
+						<a-box width="0.2" height="0.01" depth="0.04" color="#ffffff" position="0 0 0.02"></a-box>
+						<!-- 尾翼 -->
+						<a-box width="0.06" height="0.03" depth="0.01" color="#ffffff" position="0 0.02 -0.05"></a-box>
+					</a-entity>
+					
+					<!-- 飛行機の軌跡（リング） -->
+					<a-ring radius-inner="0.74" radius-outer="0.75" material="color: #ffffff; transparent: true; opacity: 0.3" rotation="90 0 0"></a-ring>
+				</a-entity>
+			</a-entity>
+
+		</a-entity>
 	</a-scene>
 
-	<!-- AR演出オーバーレイ -->
-	<div id="ar-overlay" class="ar-overlay-container">
-		
-		<!-- 本物の3D描画エリア（Three.js） -->
-		<div id="globe-3d"></div>
-
-		<!-- 飛行機と軌跡 -->
-		<svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
-			<path id="flight-path" class="contrail" d="" pathLength="2500" />
-			<g id="flight-plane" class="plane-group">
-				<g transform="scale(4.5) translate(-12, -21)">
-					<path class="plane-icon" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-				</g>
-			</g>
-		</svg>
-	</div>
-
 	<script>
-		// ==========================================
-		// Three.js リアル3D地球儀の構築
-		// ==========================================
-		function init3DGlobe() {
-			const container = document.getElementById("globe-3d");
-			// A-Frameに内包されているTHREEを使用
-			const scene = new THREE.Scene();
-			const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-			camera.position.z = 4.5;
-			
-			const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-			renderer.setSize(280, 280);
-			container.appendChild(renderer.domElement);
-
-			const globeGroup = new THREE.Group();
-			scene.add(globeGroup);
-
-			// 1. コアの球体（海）: 光を反射するPhongマテリアルで立体的な陰影を生成
-			const coreGeo = new THREE.SphereGeometry(1.3, 32, 32);
-			const coreMat = new THREE.MeshPhongMaterial({
-				color: 0x224571,      // ベースのネイビー
-				emissive: 0x051020,   // うっすら自発光させて暗くなりすぎないように
-				specular: 0x5588aa,   // 光が当たったときのハイライト
-				shininess: 25         // 表面のツヤ感
-			});
-			const core = new THREE.Mesh(coreGeo, coreMat);
-			globeGroup.add(core);
-
-			// 2. 緯線・経線のワイヤーフレーム（少しだけ浮かせる）
-			const gridGeo = new THREE.SphereGeometry(1.32, 18, 12);
-			const gridMat = new THREE.MeshBasicMaterial({
-				color: 0xffffff,
-				wireframe: true,
-				transparent: true,
-				opacity: 0.25
-			});
-			const grid = new THREE.Mesh(gridGeo, gridMat);
-			globeGroup.add(grid);
-
-			// 3. 仮想の大陸（ローポリゴンの幾何学シェイプを重ねて大陸風に）
-			const landGeo = new THREE.IcosahedronGeometry(1.35, 2);
-			const landMat = new THREE.MeshBasicMaterial({
-				color: 0xffffff,
-				wireframe: true,
-				transparent: true,
-				opacity: 0.65
-			});
-			const land = new THREE.Mesh(landGeo, landMat);
-			globeGroup.add(land);
-
-			// 4. 照明（ライト）の追加：これが立体感の命！
-			const dirLight = new THREE.DirectionalLight(0xffffff, 1.3);
-			dirLight.position.set(5, 3, 5); // 右上から光を当てる
-			scene.add(dirLight);
-			
-			const ambLight = new THREE.AmbientLight(0xffffff, 0.6); // 全体的な明るさ底上げ
-			scene.add(ambLight);
-
-			// 地軸の傾き（23.5度）を再現
-			globeGroup.rotation.z = 23.5 * (Math.PI / 180);
-
-			// アニメーションループ
-			function animateGlobe() {
-				requestAnimationFrame(animateGlobe);
-				// ゆっくり自転させる
-				globeGroup.rotation.y += 0.005;
-				renderer.render(scene, camera);
-			}
-			animateGlobe();
-		}
-
-		// ==========================================
-		// メインロジック（AR・ロード・飛行機）
-		// ==========================================
 		document.addEventListener("DOMContentLoaded", function() {
-			// Three.jsの初期化を実行
-			init3DGlobe();
-
 			const targetEntity = document.querySelector("#ar-target");
 			const popoutLoader = document.getElementById("popout-loader");
-			const arOverlay = document.getElementById("ar-overlay");
-			
-			const flightPath = document.getElementById("flight-path");
-			const flightPlane = document.getElementById("flight-plane");
-
-			let isTracking = false;
-			let flightInterval = null;
+			const hologramGroup = document.querySelector("#hologram-group");
 			let loadTimeout = null;
-
-			const routes = [
-				{ path: "M -100,1400 Q 540,600 1180,400" },
-				{ path: "M -100,500 Q 540,1300 1180,1400" },
-				{ path: "M 1180,1100 Q 540,500 -100,200" }
-			];
-
-			function triggerFlight() {
-				if (!isTracking) return;
-				const route = routes[Math.floor(Math.random() * routes.length)];
-				flightPath.setAttribute("d", route.path);
-				flightPlane.style.offsetPath = `path("${route.path}")`;
-
-				arOverlay.classList.remove("is-animating");
-				void arOverlay.offsetWidth;
-				arOverlay.classList.add("is-animating");
-			}
 
 			// マーカー認識時
 			targetEntity.addEventListener("targetFound", () => {
-				isTracking = true;
+				// 1. ローディングUIを画面中央に出現させる
 				popoutLoader.classList.add("is-active");
 
+				// 2. 約1.6秒後にロード完了
 				loadTimeout = setTimeout(() => {
+					// ロードUIを消す
 					popoutLoader.classList.remove("is-active");
-					arOverlay.classList.add("active");
-					triggerFlight();
-
-					if (!flightInterval) {
-						flightInterval = setInterval(triggerFlight, 4500);
-					}
+					
+					// マーカーの上に3Dホログラムを「ポコッ」と出現させる（popupイベント発火）
+					hologramGroup.emit("popup");
 				}, 1600);
 			});
 
 			// マーカーロスト時
 			targetEntity.addEventListener("targetLost", () => {
-				isTracking = false;
-				
 				clearTimeout(loadTimeout);
-				if (flightInterval) {
-					clearInterval(flightInterval);
-					flightInterval = null;
-				}
-
 				popoutLoader.classList.remove("is-active");
-				arOverlay.classList.remove("active");
-				arOverlay.classList.remove("is-animating");
+				
+				// ホログラムのスケールを0に戻して隠す
+				hologramGroup.setAttribute("scale", "0 0 0");
 			});
 		});
 	</script>
