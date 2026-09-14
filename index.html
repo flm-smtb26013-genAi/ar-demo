@@ -37,7 +37,7 @@
 		.loader-text { font-size: 11px; letter-spacing: 2px; opacity: 0.8; }
 
 		/* ==========================================
-		   2. ホログラムロゴUI（すりガラスの座布団付きHUD）
+		   2. ホログラムロゴUI
 		   ========================================== */
 		#hologram-logo {
 			position: fixed;
@@ -91,7 +91,7 @@
 		@keyframes meteorStrike { 0% { opacity: 0; transform: translate(600px, -600px) scale(2); } 40% { opacity: 1; } 100% { opacity: 1; transform: translate(0, 0) scale(1); } }
 
 		/* ==========================================
-		   画面フラッシュ演出用（ジェット通過時の衝撃波表現）
+		   画面フラッシュ演出用
 		   ========================================== */
 		#flash-overlay {
 			position: fixed; inset: 0; background: #ffffff;
@@ -113,7 +113,7 @@
 	<!-- ジェット通過時のフラッシュエフェクト -->
 	<div id="flash-overlay"></div>
 
-	<!-- 2. ホログラムロゴ（座布団付きHUD） -->
+	<!-- 2. ホログラムロゴ -->
 	<div id="hologram-logo">
 		<svg class="animated-logo" width="574" height="534" viewBox="0 0 574 534" xmlns="http://www.w3.org/2000/svg">
 			<path class="part compass icon-line" d="M98.01 283.996L60.5557 299.526C59.9688 299.769 59.1382 300.473 58.9865 301.09C57.9596 305.265 56.3872 321.928 69.9166 363.498C106.023 447.907 179.558 508.082 286.417 515.498C351.753 512.643 382.365 498.491 397.417 488.998L410.078 480.557C410.54 480.249 411.165 480.377 411.469 480.841L419.769 493.509C420.108 494.027 419.921 494.716 419.36 494.977C402.715 502.748 358.475 532.693 274.917 530.998C130.001 515.476 61.6854 428.703 38.5105 300.519C38.452 300.195 38.2377 299.917 37.9381 299.781L3.08716 283.982C2.27976 283.616 2.31257 282.458 3.1394 282.139L37.8716 268.709C38.2083 268.579 38.4492 268.273 38.5014 267.916C47.302 207.735 63.3156 164.506 96.9807 129.498C145.38 72.0666 201.803 41.3118 272.272 36.5411C272.663 36.5146 273.006 36.2635 273.145 35.8977L285.6 3.14466C285.911 2.32806 287.046 2.27435 287.432 3.05796L303.67 35.9983C303.823 36.3091 304.134 36.519 304.479 36.5524C354.529 41.3995 380.892 48.5188 420.409 75.3125C420.927 75.6641 421.007 76.4081 420.564 76.8512L409.5 87.9143C409.162 88.2533 408.623 88.2991 408.225 88.0312C375.183 65.7622 352.698 57.8708 304.641 55.0403C304.214 55.0152 303.808 55.2645 303.647 55.6607L287.464 95.4237C287.111 96.2919 285.865 96.2406 285.584 95.3463L273.149 55.7373C273.012 55.3022 272.594 55.0147 272.138 55.0395C201.749 58.8723 148.434 88.5535 107.564 140.498C78.2145 172.417 65.206 212.314 59.4971 267.711C59.4498 268.17 59.7226 268.606 60.1574 268.76L97.9604 282.13C98.8243 282.435 98.8565 283.645 98.01 283.996Z" />
@@ -145,13 +145,8 @@
 			     ★第2ステージ：奥から手前へ猛スピードで突っ込んでくる巨大ジェット機
 			     ======================================================== -->
 			<a-entity id="flyby-stage" visible="false">
-				<!-- 空間の奥行きを強調するワープリング（飛行機が通る軌道） -->
-				<a-ring position="0 0 -8" radius-inner="1.8" radius-outer="2.0" material="color: #F0F3FA; transparent: true; opacity: 0.2"></a-ring>
-				<a-ring position="0 0 -4" radius-inner="1.8" radius-outer="2.0" material="color: #F0F3FA; transparent: true; opacity: 0.4"></a-ring>
-				<a-ring position="0 0  0" radius-inner="1.8" radius-outer="2.0" material="color: #F0F3FA; transparent: true; opacity: 0.6"></a-ring>
-
-				<!-- 巨大ジェット機本体：Z軸-15から、一気に手前Z=3へ拡大しながら飛んでくる -->
-				<a-entity id="massive-plane" position="0 -1.0 -15" rotation="10 180 0" scale="0.1 0.1 0.1">
+				<!-- ★修正：Z軸を-8にして画面外に逸れるのを防止、常にカメラの中央に向かうように補正 -->
+				<a-entity id="massive-plane" position="0 0 -8" rotation="0 180 0" scale="0.05 0.05 0.05">
 					<a-cone radius-bottom="0.25" radius-top="0" height="0.8" rotation="-90 0 0" position="0 0 -1.2" color="#ffffff" material="metalness: 0.4"></a-cone>
 					<a-cylinder radius="0.25" height="2.0" rotation="90 0 0" position="0 0 0" color="#ffffff" material="metalness: 0.4"></a-cylinder>
 					<a-cone radius-bottom="0" radius-top="0.25" height="1.0" rotation="-90 0 0" position="0 0 1.5" color="#ffffff" material="metalness: 0.4"></a-cone>
@@ -162,7 +157,7 @@
 			</a-entity>
 
 			<!-- ========================================================
-			     ★第2.5ステージ：巨大キャリーケースの横移動（ゆっくり・隙間なく繋ぐ）
+			     ★第2.5ステージ：巨大キャリーケースの横移動
 			     ======================================================== -->
 			<a-entity id="suitcase-stage" visible="false">
 				<a-entity id="massive-suitcase" position="4 -0.5 -2" scale="0.8 0.8 0.8">
@@ -184,28 +179,36 @@
 			</a-entity>
 
 			<!-- ========================================================
-			     ★第2.8ステージ：3Dホテル＆飛び込み演出（シンプル構成）
+			     ★第2.8ステージ：3Dホテル＆飛び込み演出
 			     ======================================================== -->
-			<a-entity id="hotel-stage" visible="false" position="0 -0.5 -8" scale="0 0 0">
+			<!-- ★修正：Z位置を-4にし、画面にしっかり収まるように調整 -->
+			<a-entity id="hotel-stage" visible="false" position="0 -0.5 -4" scale="0 0 0">
 				<!-- ホテル本体 -->
 				<a-box width="2" height="3" depth="0.8" color="#224571" material="metalness: 0.5"></a-box>
 				<a-box width="2.02" height="3.02" depth="0.82" material="color: #ffffff; wireframe: true; opacity: 0.6; transparent: true"></a-box>
-				
-				<!-- 屋上の装飾 -->
 				<a-cylinder radius="0.1" height="0.5" position="0 1.75 0" color="#ffffff"></a-cylinder>
 
-				<!-- 客室の窓（opacityアニメーションで点灯） -->
-				<!-- 3F -->
+				<!-- 客室の窓（★修正：消灯時用に暗いベースを敷くことで、点灯のメリハリを強化） -->
+				<!-- 3F ベース -->
+				<a-plane position="-0.6 0.8 0.405" width="0.4" height="0.4" color="#05101a"></a-plane>
+				<a-plane position="0 0.8 0.405" width="0.4" height="0.4" color="#05101a"></a-plane>
+				<a-plane position="0.6 0.8 0.405" width="0.4" height="0.4" color="#05101a"></a-plane>
+				<!-- 3F 発光部（最初はopacity:0） -->
 				<a-plane class="hotel-window" position="-0.6 0.8 0.41" width="0.4" height="0.4" color="#F0F3FA" material="opacity: 0; transparent: true"></a-plane>
 				<a-plane class="hotel-window" position="0 0.8 0.41" width="0.4" height="0.4" color="#F0F3FA" material="opacity: 0; transparent: true"></a-plane>
 				<a-plane class="hotel-window" position="0.6 0.8 0.41" width="0.4" height="0.4" color="#F0F3FA" material="opacity: 0; transparent: true"></a-plane>
-				<!-- 2F -->
+				
+				<!-- 2F ベース -->
+				<a-plane position="-0.6 0.1 0.405" width="0.4" height="0.4" color="#05101a"></a-plane>
+				<a-plane position="0 0.1 0.405" width="0.4" height="0.4" color="#05101a"></a-plane>
+				<a-plane position="0.6 0.1 0.405" width="0.4" height="0.4" color="#05101a"></a-plane>
+				<!-- 2F 発光部（最初はopacity:0） -->
 				<a-plane class="hotel-window" position="-0.6 0.1 0.41" width="0.4" height="0.4" color="#F0F3FA" material="opacity: 0; transparent: true"></a-plane>
 				<a-plane class="hotel-window" position="0 0.1 0.41" width="0.4" height="0.4" color="#F0F3FA" material="opacity: 0; transparent: true"></a-plane>
 				<a-plane class="hotel-window" position="0.6 0.1 0.41" width="0.4" height="0.4" color="#F0F3FA" material="opacity: 0; transparent: true"></a-plane>
 
 				<!-- 1F エントランス -->
-				<a-box position="0 -1.0 0.4" width="1.0" height="1.0" depth="0.05" color="#224571"></a-box>
+				<a-box position="0 -1.0 0.4" width="1.0" height="1.0" depth="0.05" color="#05101a"></a-box>
 				<a-box position="0 -1.0 0.4" width="1.02" height="1.02" depth="0.06" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
 				
 				<!-- 扉（左右にスライドして開く） -->
@@ -217,11 +220,11 @@
 				</a-plane>
 				
 				<!-- 扉の奥（飛び込んだ際に画面を覆う光の空間） -->
-				<a-plane position="0 -1.0 0.39" width="0.98" height="0.98" color="#F0F3FA" material="shader: flat"></a-plane>
+				<a-plane position="0 -1.0 0.42" width="0.98" height="0.98" color="#ffffff" material="shader: flat"></a-plane>
 			</a-entity>
 
 			<!-- ========================================================
-			     第3ステージ：地球儀 ＆ 3機旋回グループ（ユーザー提示の元コードを完全復元）
+			     第3ステージ：地球儀 ＆ 3機旋回グループ
 			     ======================================================== -->
 			<a-entity id="hologram-group" position="0 -0.15 0" scale="0 0 0" 
 					  animation="property: scale; to: 1 1 1; dur: 1200; easing: easeOutElastic; startEvents: popup;">
@@ -311,9 +314,9 @@
 					popoutLoader.classList.remove("is-active");
 					flybyStage.setAttribute("visible", "true");
 					
-					// 飛行機を奥(-15)から手前(+3)へ一気に加速させる
-					massivePlane.setAttribute("animation__fly", "property: position; from: 0 -0.5 -15; to: 0 2.5 3; dur: 2200; easing: easeInCubic;");
-					massivePlane.setAttribute("animation__scale", "property: scale; from: 0.1 0.1 0.1; to: 2.5 2.5 2.5; dur: 2200; easing: easeInCubic;");
+					// ★修正: 飛行機をZ軸奥（-8）から手前(+3)へ一直線に加速（画面から外れないように調整）
+					massivePlane.setAttribute("animation__fly", "property: position; from: 0 0 -8; to: 0 0 3; dur: 2200; easing: easeInCubic;");
+					massivePlane.setAttribute("animation__scale", "property: scale; from: 0.05 0.05 0.05; to: 2.5 2.5 2.5; dur: 2200; easing: easeInCubic;");
 
 					// 3. ジェット機通過時（2.2秒後）フラッシュと同時にキャリーケース移動開始
 					flybyTimeout = setTimeout(() => {
@@ -326,7 +329,7 @@
 						massivePlane.removeAttribute("animation__fly");
 						massivePlane.removeAttribute("animation__scale");
 
-						// 隙間なくキャリーケース移動開始 (スピードを落とし 3.5秒で通過)
+						// キャリーケース移動開始 (3.5秒間)
 						suitcaseStage.setAttribute("visible", "true");
 						massiveSuitcase.setAttribute("animation__move", "property: position; from: 4 -0.5 -2; to: -4 -0.5 -2; dur: 3500; easing: easeInOutSine;");
 						massiveSuitcase.setAttribute("animation__rotate", "property: rotation; from: 10 -30 10; to: -10 30 -10; dur: 3500; easing: linear;");
@@ -340,7 +343,7 @@
 
 							// 3Dホテル出現（フワッとスケールアップ）
 							hotelStage.setAttribute("visible", "true");
-							hotelStage.setAttribute("animation__pop", "property: scale; from: 0 0 0; to: 1 1 1; dur: 800; easing: easeOutElastic;");
+							hotelStage.setAttribute("animation__pop", "property: scale; from: 0 0 0; to: 1.5 1.5 1.5; dur: 800; easing: easeOutElastic;");
 
 							// 窓の明かりが順番に点灯（800ms 〜 1800ms の間）
 							hotelWindows.forEach((win, index) => {
@@ -356,10 +359,10 @@
 							}, 2000);
 
 							// ホテルの扉へカメラが飛び込む（2600ms時点）
+							// ★修正：Y軸を大きく上に持ち上げる（to: 0 10.0 4）ことで、カメラが2階ではなく「Y=-1.0の1階扉の中心」をすり抜けるように計算。
 							setTimeout(() => {
-								// ホテル自体をカメラ側に猛スピードで引き寄せ、スケールを拡大して扉の奥の白（#F0F3FA）で画面を覆う
-								hotelStage.setAttribute("animation__dive", "property: position; to: 0 -0.5 3; dur: 800; easing: easeInCubic;");
-								hotelStage.setAttribute("animation__dive_scale", "property: scale; to: 8 8 8; dur: 800; easing: easeInCubic;");
+								hotelStage.setAttribute("animation__dive", "property: position; to: 0 10.0 4; dur: 800; easing: easeInCubic;");
+								hotelStage.setAttribute("animation__dive_scale", "property: scale; to: 10 10 10; dur: 800; easing: easeInCubic;");
 							}, 2600);
 
 							// 5. 飛び込み完了後（3400ms時点）、地球儀表示へ
@@ -369,7 +372,7 @@
 								hotelStage.removeAttribute("animation__pop");
 								hotelStage.removeAttribute("animation__dive");
 								hotelStage.removeAttribute("animation__dive_scale");
-								hotelStage.setAttribute("position", "0 -0.5 -8");
+								hotelStage.setAttribute("position", "0 -0.5 -4");
 								hotelStage.setAttribute("scale", "0 0 0");
 								doorLeft.removeAttribute("animation__open");
 								doorLeft.setAttribute("position", "-0.25 -1.0 0.44");
@@ -412,8 +415,8 @@
 				flybyStage.setAttribute("visible", "false");
 				massivePlane.removeAttribute("animation__fly");
 				massivePlane.removeAttribute("animation__scale");
-				massivePlane.setAttribute("position", "0 -1.0 -15");
-				massivePlane.setAttribute("scale", "0.1 0.1 0.1");
+				massivePlane.setAttribute("position", "0 0 -8");
+				massivePlane.setAttribute("scale", "0.05 0.05 0.05");
 
 				suitcaseStage.setAttribute("visible", "false");
 				massiveSuitcase.removeAttribute("animation__move");
