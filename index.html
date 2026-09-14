@@ -172,8 +172,8 @@
 			     ★追加：巨大キャリーケースの横移動（第2.5ステージ）
 			     ======================================================== -->
 			<a-entity id="suitcase-stage" visible="false">
-				<!-- キャリーケース本体：右から左へ画面の大部分を埋めるサイズで移動 -->
-				<a-entity id="massive-suitcase" position="8 0 2" scale="2.5 2.5 2.5">
+				<!-- キャリーケース本体：少し奥に配置し、全体像が把握できるサイズ感に調整 -->
+				<a-entity id="massive-suitcase" position="5 -0.5 -2" scale="0.8 0.8 0.8">
 					<!-- ボディ（ネイビー） -->
 					<a-box width="1.0" height="1.4" depth="0.6" color="#224571" material="metalness: 0.5; roughness: 0.4"></a-box>
 					<!-- ボディの縁取り・凹凸ライン（ホワイト） -->
@@ -302,7 +302,8 @@
 
 						// キャリーケースを表示して横移動開始 (2.5秒間)
 						suitcaseStage.setAttribute("visible", "true");
-						massiveSuitcase.setAttribute("animation__move", "property: position; from: 8 0 2; to: -8 0 2; dur: 2500; easing: easeInOutSine;");
+						// X軸を5から-5へ、Z軸を-2（奥）にして全体が見えるように修正
+						massiveSuitcase.setAttribute("animation__move", "property: position; from: 5 -0.5 -2; to: -5 -0.5 -2; dur: 2500; easing: easeInOutSine;");
 						massiveSuitcase.setAttribute("animation__rotate", "property: rotation; from: 10 -30 10; to: -10 30 -10; dur: 2500; easing: linear;");
 
 						suitcaseTimeout = setTimeout(() => {
@@ -355,3 +356,5 @@
 </body>
 
 </html>
+
+キャリーケースが四角すぎるのと、取っ手が長すぎる、タイヤが大きすぎる、少し傾けて斜めを向かせてほしい。アニメーションのスピードはもう少しゆっくりのほうがいい。これだとキャリケースが何かただの四角い箱にしか見えないから、キャリケースと一目でわかる工夫を加えて
