@@ -37,14 +37,14 @@
 		.loader-text { font-size: 11px; letter-spacing: 2px; opacity: 0.8; }
 
 		/* ==========================================
-		   2. 回廊・ホール風ウォーキング演出（ホワイト＆クリーン）
+		   2. 白い城の回廊ウォーク：ウエストアップ人物（画面下端に密着）
 		   ========================================== */
 		#walking-person-container {
 			position: fixed;
-			bottom: 0;
+			bottom: -5px;
 			left: 0;
 			width: 100vw;
-			height: 240px;
+			height: 220px;
 			z-index: 500;
 			pointer-events: none;
 			display: flex;
@@ -69,7 +69,7 @@
 		.walking-svg {
 			width: 100vw;
 			max-width: 480px;
-			height: 210px;
+			height: 200px;
 			filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.95));
 			animation: walkBobbing 0.4s ease-in-out infinite alternate;
 			display: block;
@@ -184,12 +184,11 @@
 		<div class="loader-text">Finding Your Journey...</div>
 	</div>
 
-	<!-- 2. 街並みウォーク：ホワイト＆クリーンな後ろ姿ウエストアップ人物 -->
+	<!-- 2. 白い城の回廊ウォーク：ウエストアップ人物 -->
 	<div id="walking-person-container">
 		<svg class="walking-svg" viewBox="0 0 300 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-			<!-- 後ろ姿：頭部・首・肩・背中(ホワイトを基調にクリーンなホログラム調) -->
-			<circle cx="150" cy="38" r="22" fill="#ffffff" />
-			<path d="M 75 80 C 75 58, 110 52, 150 52 C 190 52, 225 58, 225 80 L 245 160 L 55 160 Z" fill="#ffffff" />
+			<circle cx="150" cy="38" r="24" fill="#ffffff" />
+			<path d="M 70 85 C 70 58, 110 52, 150 52 C 190 52, 230 58, 230 85 L 250 160 L 50 160 Z" fill="#ffffff" />
 		</svg>
 	</div>
 
@@ -232,57 +231,32 @@
 			<a-light type="ambient" intensity="0.5" color="#ffffff"></a-light>
 
 			<!-- ========================================================
-			     ★同期して奥（サイズ0）から手前へ拡大しながら通り過ぎる3Dビル群
+			     ★白い城の回廊（White Castle Hallway風アーチ・柱の通路）
 			     ======================================================== -->
-			<a-entity id="street-3d-group" visible="false">
-				<!-- 左側レーン -->
-				<a-entity animation="property: position; from: -0.1 -0.05 -3.5; to: -1.4 -0.2 1.0; dur: 1800; loop: true; easing: linear;"
-				          animation__scale="property: scale; from: 0.05 0.05 0.05; to: 1.1 1.1 1.1; dur: 1800; loop: true; easing: linear;">
-					<a-box width="0.2" height="0.9" depth="0.2" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-box>
-					<a-box width="0.205" height="0.905" depth="0.205" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
-				</a-entity>
-				
-				<a-entity animation="property: position; from: -0.25 -0.05 -3.5; to: -1.7 -0.2 1.0; dur: 1800; delay: 450; loop: true; easing: linear;"
-				          animation__scale="property: scale; from: 0.05 0.05 0.05; to: 1.1 1.1 1.1; dur: 1800; delay: 450; loop: true; easing: linear;">
-					<a-box width="0.26" height="1.2" depth="0.26" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-box>
-					<a-box width="0.265" height="1.205" depth="0.265" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
+			<a-entity id="hallway-3d-group" visible="false">
+				<!-- 連続する白いアーチ構造物が奥(-Z: -4.0)から手前(+Z: 1.0)へ流れていく -->
+				<a-entity animation="property: position; from: 0 -0.2 -4.0; to: 0 -0.2 1.2; dur: 1600; loop: true; easing: linear;"
+				          animation__scale="property: scale; from: 0.1 0.1 0.1; to: 1.2 1.2 1.2; dur: 1600; loop: true; easing: linear;">
+					<!-- 左柱 -->
+					<a-box position="-0.45 0.5 0" width="0.1" height="1.0" depth="0.1" color="#ffffff" material="opacity: 0.85; transparent: true"></a-box>
+					<!-- 右柱 -->
+					<a-box position="0.45 0.5 0" width="0.1" height="1.0" depth="0.1" color="#ffffff" material="opacity: 0.85; transparent: true"></a-box>
+					<!-- 天井アーチ -->
+					<a-box position="0 1.0 0" width="1.0" height="0.1" depth="0.1" color="#ffffff" material="opacity: 0.85; transparent: true"></a-box>
 				</a-entity>
 
-				<a-entity animation="property: position; from: -0.05 -0.05 -3.5; to: -1.0 -0.2 1.0; dur: 1800; delay: 900; loop: true; easing: linear;"
-				          animation__scale="property: scale; from: 0.05 0.05 0.05; to: 1.1 1.1 1.1; dur: 1800; delay: 900; loop: true; easing: linear;">
-					<a-box width="0.18" height="0.7" depth="0.18" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-box>
-					<a-box width="0.185" height="0.705" depth="0.185" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
+				<a-entity animation="property: position; from: 0 -0.2 -4.0; to: 0 -0.2 1.2; dur: 1600; delay: 530; loop: true; easing: linear;"
+				          animation__scale="property: scale; from: 0.1 0.1 0.1; to: 1.2 1.2 1.2; dur: 1600; delay: 530; loop: true; easing: linear;">
+					<a-box position="-0.45 0.5 0" width="0.1" height="1.0" depth="0.1" color="#ffffff" material="opacity: 0.85; transparent: true"></a-box>
+					<a-box position="0.45 0.5 0" width="0.1" height="1.0" depth="0.1" color="#ffffff" material="opacity: 0.85; transparent: true"></a-box>
+					<a-box position="0 1.0 0" width="1.0" height="0.1" depth="0.1" color="#ffffff" material="opacity: 0.85; transparent: true"></a-box>
 				</a-entity>
 
-				<a-entity animation="property: position; from: -0.35 -0.05 -3.5; to: -2.0 -0.2 1.0; dur: 1800; delay: 1350; loop: true; easing: linear;"
-				          animation__scale="property: scale; from: 0.05 0.05 0.05; to: 1.1 1.1 1.1; dur: 1800; delay: 1350; loop: true; easing: linear;">
-					<a-box width="0.3" height="1.5" depth="0.3" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-box>
-					<a-box width="0.305" height="1.505" depth="0.305" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
-				</a-entity>
-
-				<!-- 右側レーン -->
-				<a-entity animation="property: position; from: 0.1 -0.05 -3.5; to: 1.4 -0.2 1.0; dur: 1800; delay: 225; loop: true; easing: linear;"
-				          animation__scale="property: scale; from: 0.05 0.05 0.05; to: 1.1 1.1 1.1; dur: 1800; delay: 225; loop: true; easing: linear;">
-					<a-box width="0.22" height="1.0" depth="0.22" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-box>
-					<a-box width="0.225" height="1.005" depth="0.225" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
-				</a-entity>
-
-				<a-entity animation="property: position; from: 0.25 -0.05 -3.5; to: 1.7 -0.2 1.0; dur: 1800; delay: 675; loop: true; easing: linear;"
-				          animation__scale="property: scale; from: 0.05 0.05 0.05; to: 1.1 1.1 1.1; dur: 1800; delay: 675; loop: true; easing: linear;">
-					<a-box width="0.28" height="1.3" depth="0.28" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-box>
-					<a-box width="0.285" height="1.305" depth="0.285" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
-				</a-entity>
-
-				<a-entity animation="property: position; from: 0.05 -0.05 -3.5; to: 1.0 -0.2 1.0; dur: 1800; delay: 1125; loop: true; easing: linear;"
-				          animation__scale="property: scale; from: 0.05 0.05 0.05; to: 1.1 1.1 1.1; dur: 1800; delay: 1125; loop: true; easing: linear;">
-					<a-box width="0.16" height="0.8" depth="0.16" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-box>
-					<a-box width="0.165" height="0.805" depth="0.165" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
-				</a-entity>
-
-				<a-entity animation="property: position; from: 0.35 -0.05 -3.5; to: 2.0 -0.2 1.0; dur: 1800; delay: 1575; loop: true; easing: linear;"
-				          animation__scale="property: scale; from: 0.05 0.05 0.05; to: 1.1 1.1 1.1; dur: 1800; delay: 1575; loop: true; easing: linear;">
-					<a-box width="0.32" height="1.6" depth="0.32" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-box>
-					<a-box width="0.325" height="1.605" depth="0.325" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
+				<a-entity animation="property: position; from: 0 -0.2 -4.0; to: 0 -0.2 1.2; dur: 1600; delay: 1060; loop: true; easing: linear;"
+				          animation__scale="property: scale; from: 0.1 0.1 0.1; to: 1.2 1.2 1.2; dur: 1600; delay: 1060; loop: true; easing: linear;">
+					<a-box position="-0.45 0.5 0" width="0.1" height="1.0" depth="0.1" color="#ffffff" material="opacity: 0.85; transparent: true"></a-box>
+					<a-box position="0.45 0.5 0" width="0.1" height="1.0" depth="0.1" color="#ffffff" material="opacity: 0.85; transparent: true"></a-box>
+					<a-box position="0 1.0 0" width="1.0" height="0.1" depth="0.1" color="#ffffff" material="opacity: 0.85; transparent: true"></a-box>
 				</a-entity>
 			</a-entity>
 
@@ -343,7 +317,7 @@
 			const targetEntity = document.querySelector("#ar-target");
 			const popoutLoader = document.getElementById("popout-loader");
 			const walkingPerson = document.getElementById("walking-person-container");
-			const street3DGroup = document.querySelector("#street-3d-group");
+			const hallway3DGroup = document.querySelector("#hallway-3d-group");
 			const hologramGroup = document.querySelector("#hologram-group");
 			const hologramLogo = document.getElementById("hologram-logo");
 			
@@ -382,18 +356,18 @@
 				loadTimeout = setTimeout(() => {
 					popoutLoader.classList.remove("is-active");
 					
-					street3DGroup.setAttribute("visible", "true");
-					street3DGroup.setAttribute("position", "0 0 0");
+					hallway3DGroup.setAttribute("visible", "true");
+					hallway3DGroup.setAttribute("position", "0 0 0");
 					walkingPerson.classList.remove("is-exiting");
 					walkingPerson.classList.add("is-active");
 
 					walkTimeout = setTimeout(() => {
 						walkingPerson.classList.add("is-exiting");
-						street3DGroup.setAttribute("animation__fall", "property: position; to: 0 -2.5 0; dur: 600; easing: easeInCubic;");
+						hallway3DGroup.setAttribute("animation__fall", "property: position; to: 0 -2.5 0; dur: 600; easing: easeInCubic;");
 
 						exitTimeout = setTimeout(() => {
-							street3DGroup.setAttribute("visible", "false");
-							street3DGroup.removeAttribute("animation__fall");
+							hallway3DGroup.setAttribute("visible", "false");
+							hallway3DGroup.removeAttribute("animation__fall");
 							walkingPerson.classList.remove("is-active", "is-exiting");
 
 							// 1. まず地球儀（hologram-group）をポップアップ表示 ＋ 飛行機＆飛行機雲スタート
@@ -411,7 +385,7 @@
 
 						}, 600);
 
-					}, 5000); // 5秒間街並みを歩く
+					}, 5000); // 5秒間回廊を歩く
 
 				}, 1600);
 			});
@@ -431,9 +405,9 @@
 				popoutLoader.classList.remove("is-active");
 				walkingPerson.classList.remove("is-active", "is-exiting");
 				
-				street3DGroup.setAttribute("visible", "false");
-				street3DGroup.removeAttribute("animation__fall");
-				street3DGroup.setAttribute("position", "0 0 0");
+				hallway3DGroup.setAttribute("visible", "false");
+				hallway3DGroup.removeAttribute("animation__fall");
+				hallway3DGroup.setAttribute("position", "0 0 0");
 
 				hologramGroup.setAttribute("scale", "0 0 0");
 				hologramLogo.classList.remove("is-playing");
