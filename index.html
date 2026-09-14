@@ -4,7 +4,9 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<!-- A-Frame v1.5.0 -->
 	<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+	<!-- MindAR for A-Frame v1.2.5 -->
 	<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 	<style>
 		body {
@@ -42,17 +44,13 @@
 			top: 50%; left: 50%;
 			width: 320px;
 			box-sizing: border-box;
-			padding: 30px 35px 15px; /* 座布団の余白設定 */
-			
-			/* ▼ 追加: すりガラス風の座布団エフェクト ▼ */
-			background: rgba(15, 35, 60, 0.65); /* ブランドカラーに合わせたダークネイビーの半透明 */
-			backdrop-filter: blur(8px); /* 背後の景色や地球儀を美しくぼかす */
+			padding: 30px 35px 15px;
+			background: rgba(15, 35, 60, 0.65);
+			backdrop-filter: blur(8px);
 			-webkit-backdrop-filter: blur(8px);
-			border: 1px solid rgba(240, 243, 250, 0.2); /* ガラスのフチの光沢 */
-			border-radius: 24px; /* 丸みのあるパネル */
+			border: 1px solid rgba(240, 243, 250, 0.2);
+			border-radius: 24px;
 			box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.05);
-			/* ▲ ここまで ▲ */
-
 			transform: translate(-50%, -60%) perspective(800px) rotateX(15deg) scale(0.9);
 			z-index: 1000;
 			pointer-events: none;
@@ -91,6 +89,14 @@
 		@keyframes spinIn { 0% { opacity: 0; transform: rotate(-180deg) scale(0.8); } 100% { opacity: 1; transform: rotate(0deg) scale(1); } }
 		@keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 		@keyframes meteorStrike { 0% { opacity: 0; transform: translate(600px, -600px) scale(2); } 40% { opacity: 1; } 100% { opacity: 1; transform: translate(0, 0) scale(1); } }
+
+		/* 画面フラッシュ演出用（ジェット通過時の衝撃波表現） */
+		#flash-overlay {
+			position: fixed; inset: 0; background: #ffffff;
+			z-index: 2000; opacity: 0; pointer-events: none;
+			transition: opacity 0.15s ease-out;
+		}
+		#flash-overlay.is-flashing { opacity: 0.8; }
 	</style>
 </head>
 
@@ -99,10 +105,13 @@
 	<div id="popout-loader">
 		<div class="loader-title">MONOTRIP</div>
 		<div class="loader-track"><div class="loader-bar"></div></div>
-		<div class="loader-text">Loading Earth...</div>
+		<div class="loader-text">Finding Your Journey...</div>
 	</div>
 
-	<!-- 2. ホログラムロゴ（座布団付き） -->
+	<!-- ジェット通過時のフラッシュエフェクト -->
+	<div id="flash-overlay"></div>
+
+	<!-- 2. ホログラムロゴ（座布団付きHUD） -->
 	<div id="hologram-logo">
 		<svg class="animated-logo" width="574" height="534" viewBox="0 0 574 534" xmlns="http://www.w3.org/2000/svg">
 			<path class="part compass icon-line" d="M98.01 283.996L60.5557 299.526C59.9688 299.769 59.1382 300.473 58.9865 301.09C57.9596 305.265 56.3872 321.928 69.9166 363.498C106.023 447.907 179.558 508.082 286.417 515.498C351.753 512.643 382.365 498.491 397.417 488.998L410.078 480.557C410.54 480.249 411.165 480.377 411.469 480.841L419.769 493.509C420.108 494.027 419.921 494.716 419.36 494.977C402.715 502.748 358.475 532.693 274.917 530.998C130.001 515.476 61.6854 428.703 38.5105 300.519C38.452 300.195 38.2377 299.917 37.9381 299.781L3.08716 283.982C2.27976 283.616 2.31257 282.458 3.1394 282.139L37.8716 268.709C38.2083 268.579 38.4492 268.273 38.5014 267.916C47.302 207.735 63.3156 164.506 96.9807 129.498C145.38 72.0666 201.803 41.3118 272.272 36.5411C272.663 36.5146 273.006 36.2635 273.145 35.8977L285.6 3.14466C285.911 2.32806 287.046 2.27435 287.432 3.05796L303.67 35.9983C303.823 36.3091 304.134 36.519 304.479 36.5524C354.529 41.3995 380.892 48.5188 420.409 75.3125C420.927 75.6641 421.007 76.4081 420.564 76.8512L409.5 87.9143C409.162 88.2533 408.623 88.2991 408.225 88.0312C375.183 65.7622 352.698 57.8708 304.641 55.0403C304.214 55.0152 303.808 55.2645 303.647 55.6607L287.464 95.4237C287.111 96.2919 285.865 96.2406 285.584 95.3463L273.149 55.7373C273.012 55.3022 272.594 55.0147 272.138 55.0395C201.749 58.8723 148.434 88.5535 107.564 140.498C78.2145 172.417 65.206 212.314 59.4971 267.711C59.4498 268.17 59.7226 268.606 60.1574 268.76L97.9604 282.13C98.8243 282.435 98.8565 283.645 98.01 283.996Z" />
@@ -110,7 +119,7 @@
 			<path class="part m-base icon-line" d="M166.008 123.527L111.084 396.184C110.888 397.16 112.084 397.792 112.78 397.08L153.214 355.705C153.346 355.57 153.438 355.4 153.477 355.215L187.489 195.998C187.663 195.185 188.697 194.927 189.233 195.564L245.276 262.236C245.63 262.658 246.258 262.714 246.681 262.361L428.749 110.797C429.682 110.021 430.933 111.265 430.161 112.201L318.39 247.923C318.109 248.264 318.089 248.755 318.334 249.122C327.853 263.406 331.298 272.378 334.427 287.562C334.609 288.443 335.773 288.67 336.261 287.914L495.013 41.7746C495.63 40.8185 494.426 39.7391 493.543 40.4564L259.678 230.38C259.255 230.723 258.635 230.665 258.284 230.249L167.752 123.079C167.212 122.44 166.173 122.707 166.008 123.527Z" />
 			<path class="part m-base icon-line" d="M419.341 329.621L397.986 223.346C397.941 223.121 397.975 222.887 398.081 222.684L418.157 184.399C418.589 183.576 419.812 183.736 420.018 184.642L459.318 357.366C459.524 358.271 458.493 358.944 457.747 358.391L419.726 330.227C419.527 330.08 419.39 329.864 419.341 329.621Z" />
 			<path class="part mountain icon-line" d="M125.917 430.498L180.722 367.299C181.099 366.865 181.764 366.837 182.176 367.239L222.127 406.228C222.55 406.641 223.237 406.599 223.606 406.138L284.674 329.925C285.062 329.441 285.792 329.423 286.203 329.888L354.143 406.689C354.318 406.887 354.408 407.154 354.391 407.418C353.527 420.799 349.682 422.109 341.3 421.048C341.056 421.017 340.828 420.894 340.668 420.707L286.184 356.897C285.782 356.427 285.055 356.43 284.657 356.904L233.332 418.118C232.673 418.903 233.482 420.053 234.444 419.699L268.229 407.252C268.638 407.101 269.098 407.233 269.365 407.578L280.36 421.78C280.676 422.187 281.249 422.288 281.685 422.013L288.939 417.432C289.593 417.019 290.447 417.476 290.469 418.249C291.005 437.094 290.125 445.384 286.141 451.884C285.793 452.451 284.995 452.486 284.573 451.971L262.941 425.636C262.636 425.266 262.112 425.163 261.691 425.392L233.519 440.672C233.156 440.868 232.709 440.822 232.394 440.554L223.698 433.163C223.27 432.799 222.625 432.859 222.272 433.297L185.417 478.998M170.417 472.498L210.912 421.632C211.206 421.263 211.201 420.737 210.901 420.373L186.137 390.371C185.755 389.908 185.052 389.884 184.639 390.321L134.417 443.498" />
-			<path class="part hammer icon-line" d="M268.417 503.998L378.885 402.984C379.203 402.694 379.299 402.233 379.124 401.84L375.584 393.875C375.477 393.634 375.473 393.352 375.566 393.105C384.18 370.166 375.186 360.175 329.213 347.143C328.364 346.902 328.197 345.751 328.964 345.314C355.101 330.443 371.646 330.523 402.792 346.435C402.873 346.476 402.95 346.529 403.017 346.591L448.12 388.224C448.31 388.4 448.425 388.648 448.441 388.907C449.463 405.635 453.216 412.756 474.516 413.976C474.768 413.991 475.014 414.099 475.19 414.281L488.271 427.83C488.635 428.207 488.647 428.8 488.298 429.191L456.017 465.327C455.676 465.708 455.101 465.771 454.686 465.472L434.415 450.858C434.109 450.637 433.956 450.253 434.013 449.88C437.206 429.064 433.301 424.052 413.672 428.441C413.508 428.477 413.332 428.474 413.171 428.428L403.522 425.671C403.152 425.566 402.754 425.682 402.499 425.97L333.417 503.998" />
+			<path class="part hammer icon-line" d="M268.417 503.998L378.885 402.984C379.203 402.694 379.299 402.233 379.124 401.84L375.584 393.875C375.477 393.634 375.473 393.352 375.566 393.105C384.18 370.166 375.186 360.175 329.213 347.143C328.364 346.902 328.197 345.751 328.964 345.314C355.101 330.443 371.646 330.523 402.792 346.435C402.873 346.476 402.95 346.529 403.017 346.591L448.12 388.224C448.31 388.4 448.425 388.648 448.441 388.907C449.463 405.635 453.216 412.756 474.516 413.976C474.768 413.991 475.014 414.099 475.19 414.281L488.271 427.83C488.635 428.207 488.647 428.8 488.298 429.191L456.017 465.327C455.676 465.708 455.101 465.771 454.686 465.472L434.415 450.858C434.109 450.637 433.956 450.253 434.013 449.88C437.206 429.064 433.301 424.052 413.672 428.441C413.508 428.477 433.32 428.474 433.171 428.428L403.522 425.671C403.152 425.566 402.754 425.682 402.499 425.97L333.417 503.998" />
 			<circle class="part comet" cx="286.917" cy="283.498" r="25" />
 		</svg>
 		<div class="logo-text">MONOTRIP</div>
@@ -124,57 +133,82 @@
 		
 		<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-		<!-- ARターゲットと地球儀・飛行機 -->
+		<!-- ARターゲット -->
 		<a-entity id="ar-target" mindar-image-target="targetIndex: 0">
-			<!-- 地球儀の配置を少し下（Y: -0.15）にずらし、ロゴと被らないように調整 -->
-			<a-entity id="hologram-group" position="0 -0.15 0" scale="0 0 0" 
-					  animation="property: scale; to: 1 1 1; dur: 1200; easing: easeOutElastic; startEvents: popup;">
-				
-				<a-light type="directional" position="1 2 1" intensity="1.5" color="#ffffff"></a-light>
-				<a-light type="ambient" intensity="0.5" color="#ffffff"></a-light>
+			
+			<a-light type="directional" position="1 2 1" intensity="1.5" color="#ffffff"></a-light>
+			<a-light type="ambient" intensity="0.6" color="#ffffff"></a-light>
 
-				<!-- 地球儀 -->
+			<!-- ========================================================
+			     ★大迫力：奥から手前へ猛スピードで突っ込んでくる巨大ジェット機（第2ステージ）
+			     ======================================================== -->
+			<a-entity id="flyby-stage" visible="false">
+				
+				<!-- 空間の奥行きを強調するワープリング（飛行機が通る軌道） -->
+				<a-ring position="0 0 -8" radius-inner="1.8" radius-outer="2.0" material="color: #F0F3FA; transparent: true; opacity: 0.2"></a-ring>
+				<a-ring position="0 0 -4" radius-inner="1.8" radius-outer="2.0" material="color: #F0F3FA; transparent: true; opacity: 0.4"></a-ring>
+				<a-ring position="0 0  0" radius-inner="1.8" radius-outer="2.0" material="color: #F0F3FA; transparent: true; opacity: 0.6"></a-ring>
+
+				<!-- 巨大ジェット機本体：Z軸-15から、一気に手前Z=3へ拡大しながら飛んでくる -->
+				<a-entity id="massive-plane" position="0 -1.0 -15" rotation="10 0 0" scale="0.1 0.1 0.1">
+					<!-- 機体ノーズ -->
+					<a-cone radius-bottom="0.25" radius-top="0" height="0.8" rotation="-90 0 0" position="0 0 -1.2" color="#ffffff" material="metalness: 0.4"></a-cone>
+					<!-- 胴体 -->
+					<a-cylinder radius="0.25" height="2.0" rotation="90 0 0" position="0 0 0" color="#ffffff" material="metalness: 0.4"></a-cylinder>
+					<!-- 後部 -->
+					<a-cone radius-bottom="0" radius-top="0.25" height="1.0" rotation="-90 0 0" position="0 0 1.5" color="#ffffff" material="metalness: 0.4"></a-cone>
+					<!-- 主翼 -->
+					<a-triangle vertex-a="0 0 -0.5" vertex-b="-1.6 0 0.8" vertex-c="1.6 0 0.8" color="#224571" material="side: double; metalness: 0.3"></a-triangle>
+					<!-- 垂直尾翼 -->
+					<a-triangle vertex-a="0 0.7 1.6" vertex-b="0 0 2.0" vertex-c="0 0 1.2" color="#224571" material="side: double"></a-triangle>
+					<!-- 水平尾翼 -->
+					<a-triangle vertex-a="0 0 1.5" vertex-b="-0.6 0 2.0" vertex-c="0.6 0 2.0" color="#ffffff" material="side: double"></a-triangle>
+				</a-entity>
+			</a-entity>
+
+			<!-- ========================================================
+			     第3ステージ：地球儀 ＆ 3機旋回グループ（初期スケール0）
+			     ======================================================== -->
+			<a-entity id="hologram-group" position="0 -0.15 0" scale="0 0 0">
+				<!-- 地球儀本体 -->
 				<a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear;">
 					<a-sphere radius="0.25" color="#224571" material="metalness: 0.3; roughness: 0.5"></a-sphere>
 					<a-sphere radius="0.26" material="color: #ffffff; wireframe: true; transparent: true; opacity: 0.2" segments-width="18" segments-height="12"></a-sphere>
 					<a-entity geometry="primitive: icosahedron; detail: 1" scale="0.27 0.27 0.27" material="color: #ffffff; wireframe: true; transparent: true; opacity: 0.6"></a-entity>
 				</a-entity>
 
-				<!-- 飛行機 1 -->
-				<a-entity rotation="15 45 0">
-					<a-ring radius-inner="0.345" radius-outer="0.35" material="color: #ffffff; transparent: true; opacity: 0.2" rotation="-90 0 0"></a-ring>
+				<!-- 飛行機 1（赤道軌道・機首向き自動追従） -->
+				<a-entity rotation="0 0 0">
+					<a-ring radius-inner="0.345" radius-outer="0.355" material="color: #ffffff; transparent: true; opacity: 0.3" rotation="90 0 0"></a-ring>
 					<a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 4500; easing: linear;">
-						<a-entity position="0.35 0 0">
+						<a-entity position="0.35 0 0" rotation="0 90 0">
 							<a-plane width="0.015" height="0.08" color="#ffffff" rotation="-90 0 0" position="0 0 0.01" material="side: double; transparent: true; opacity: 0.95"></a-plane>
-							<a-triangle vertex-a="0 0 -0.03" vertex-b="-0.035 0 0.02" vertex-c="0.035 0 0.02" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
-							<a-triangle vertex-a="0 0 0.03" vertex-b="-0.015 0 0.05" vertex-c="0.015 0 0.05" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
-							<a-triangle vertex-a="0 0.02 0.04" vertex-b="0 0 0.03" vertex-c="0 0 0.05" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
+							<a-triangle vertex-a="0 0 -0.04" vertex-b="-0.04 0 0.02" vertex-c="0.04 0 0.02" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
+							<a-triangle vertex-a="0 0 0.03" vertex-b="-0.015 0 0.06" vertex-c="0.015 0 0.06" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
 						</a-entity>
 					</a-entity>
 				</a-entity>
 
 				<!-- 飛行機 2 -->
-				<a-entity rotation="70 -30 0">
-					<a-ring radius-inner="0.395" radius-outer="0.4" material="color: #ffffff; transparent: true; opacity: 0.2" rotation="-90 0 0"></a-ring>
+				<a-entity rotation="60 -45 0">
+					<a-ring radius-inner="0.395" radius-outer="0.405" material="color: #ffffff; transparent: true; opacity: 0.3" rotation="90 0 0"></a-ring>
 					<a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 5500; easing: linear;">
-						<a-entity position="0.4 0 0">
+						<a-entity position="0.4 0 0" rotation="0 90 0">
 							<a-plane width="0.015" height="0.08" color="#ffffff" rotation="-90 0 0" position="0 0 0.01" material="side: double; transparent: true; opacity: 0.95"></a-plane>
-							<a-triangle vertex-a="0 0 -0.03" vertex-b="-0.035 0 0.02" vertex-c="0.035 0 0.02" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
-							<a-triangle vertex-a="0 0 0.03" vertex-b="-0.015 0 0.05" vertex-c="0.015 0 0.05" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
-							<a-triangle vertex-a="0 0.02 0.04" vertex-b="0 0 0.03" vertex-c="0 0 0.05" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
+							<a-triangle vertex-a="0 0 -0.04" vertex-b="-0.04 0 0.02" vertex-c="0.04 0 0.02" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
+							<a-triangle vertex-a="0 0 0.03" vertex-b="-0.015 0 0.06" vertex-c="0.015 0 0.06" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
 						</a-entity>
 					</a-entity>
 				</a-entity>
 
 				<!-- 飛行機 3 -->
-				<a-entity rotation="-45 60 0">
-					<a-ring radius-inner="0.445" radius-outer="0.45" material="color: #ffffff; transparent: true; opacity: 0.2" rotation="-90 0 0"></a-ring>
+				<a-entity rotation="-40 75 0">
+					<a-ring radius-inner="0.445" radius-outer="0.455" material="color: #ffffff; transparent: true; opacity: 0.3" rotation="90 0 0"></a-ring>
 					<a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 6500; easing: linear;">
-						<a-entity position="0.45 0 0">
+						<a-entity position="0.45 0 0" rotation="0 90 0">
 							<a-plane width="0.015" height="0.08" color="#ffffff" rotation="-90 0 0" position="0 0 0.01" material="side: double; transparent: true; opacity: 0.95"></a-plane>
-							<a-triangle vertex-a="0 0 -0.03" vertex-b="-0.035 0 0.02" vertex-c="0.035 0 0.02" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
-							<a-triangle vertex-a="0 0 0.03" vertex-b="-0.015 0 0.05" vertex-c="0.015 0 0.05" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
-							<a-triangle vertex-a="0 0.02 0.04" vertex-b="0 0 0.03" vertex-c="0 0 0.05" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
+							<a-triangle vertex-a="0 0 -0.04" vertex-b="-0.04 0 0.02" vertex-c="0.04 0 0.02" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
+							<a-triangle vertex-a="0 0 0.03" vertex-b="-0.015 0 0.06" vertex-c="0.015 0 0.06" color="#ffffff" material="side: double; transparent: true; opacity: 0.95"></a-triangle>
 						</a-entity>
 					</a-entity>
 				</a-entity>
@@ -186,35 +220,76 @@
 		document.addEventListener("DOMContentLoaded", function() {
 			const targetEntity = document.querySelector("#ar-target");
 			const popoutLoader = document.getElementById("popout-loader");
+			
+			const flybyStage = document.getElementById("flyby-stage");
+			const massivePlane = document.getElementById("massive-plane");
+			const flashOverlay = document.getElementById("flash-overlay");
+			
 			const hologramGroup = document.querySelector("#hologram-group");
 			const hologramLogo = document.getElementById("hologram-logo");
-			let loadTimeout = null;
 
-			// マーカー認識時
+			let loadTimeout = null;
+			let flybyTimeout = null;
+			let flashTimeout = null;
+			let logoTimeout = null;
+
 			targetEntity.addEventListener("targetFound", () => {
-				// 1. ローディング表示
+				// 1. ローダー開始
 				popoutLoader.classList.add("is-active");
 
-				// 2. ロード完了時（1.6秒後）
+				// 2. 約1.6秒後に巨大ジェット機のフライバイ演出（第2ステージ）へ
 				loadTimeout = setTimeout(() => {
-					// ローダーを隠す
 					popoutLoader.classList.remove("is-active");
 					
-					// 地球儀をポップアップ
-					hologramGroup.emit("popup");
+					flybyStage.setAttribute("visible", "true");
 					
-					// 同時にHUDロゴアニメーションを開始
-					hologramLogo.classList.add("is-playing");
+					// 飛行機を奥(-15)から手前(+3)へ一気に加速させるアニメーションを追加
+					massivePlane.setAttribute("animation__fly", "property: position; from: 0 -0.5 -15; to: 0 2.5 3; dur: 2200; easing: easeInCubic;");
+					massivePlane.setAttribute("animation__scale", "property: scale; from: 0.1 0.1 0.1; to: 2.5 2.5 2.5; dur: 2200; easing: easeInCubic;");
+
+					// 3. ジェット機がカメラを通過する瞬間（約2.2秒後）に画面をフラッシュさせ、地球儀を出す
+					flybyTimeout = setTimeout(() => {
+						// 画面フラッシュ演出
+						flashOverlay.classList.add("is-flashing");
+						
+						flashTimeout = setTimeout(() => {
+							flashOverlay.classList.remove("is-flashing");
+						}, 150);
+
+						// ジェット機を非表示にしてリセット
+						flybyStage.setAttribute("visible", "false");
+						massivePlane.removeAttribute("animation__fly");
+						massivePlane.removeAttribute("animation__scale");
+
+						// 4. 地球儀（hologram-group）をポップアップ表示
+						hologramGroup.setAttribute("animation", "property: scale; to: 1 1 1; dur: 1200; easing: easeOutElastic;");
+
+						// 5. 3秒間地球儀を見せたあと、ロゴアニメーションを発火
+						logoTimeout = setTimeout(() => {
+							hologramLogo.classList.add("is-playing");
+						}, 3000);
+
+					}, 2200);
+
 				}, 1600);
 			});
 
-			// マーカーロスト時
 			targetEntity.addEventListener("targetLost", () => {
 				clearTimeout(loadTimeout);
+				clearTimeout(flybyTimeout);
+				clearTimeout(flashTimeout);
+				clearTimeout(logoTimeout);
+
 				popoutLoader.classList.remove("is-active");
-				hologramGroup.setAttribute("scale", "0 0 0");
+				flashOverlay.classList.remove("is-flashing");
 				
-				// アニメーションをリセット（次に認識した際に最初から再生するため）
+				flybyStage.setAttribute("visible", "false");
+				massivePlane.removeAttribute("animation__fly");
+				massivePlane.removeAttribute("animation__scale");
+				massivePlane.setAttribute("position", "0 -1.0 -15");
+				massivePlane.setAttribute("scale", "0.1 0.1 0.1");
+
+				hologramGroup.setAttribute("scale", "0 0 0");
 				hologramLogo.classList.remove("is-playing");
 			});
 		});
