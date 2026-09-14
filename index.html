@@ -142,16 +142,15 @@
 			<a-light type="ambient" intensity="0.5" color="#ffffff"></a-light>
 
 			<!-- ========================================================
-			     ★第2ステージ：奥から手前へ頭上を飛び越えていく巨大ジェット機
+			     ★第2ステージ：奥から手前へ猛スピードで突っ込んでくる巨大ジェット機
 			     ======================================================== -->
 			<a-entity id="flyby-stage" visible="false">
-				<!-- ワープリング -->
 				<a-ring position="0 0 -8" radius-inner="1.8" radius-outer="2.0" material="color: #F0F3FA; transparent: true; opacity: 0.2"></a-ring>
 				<a-ring position="0 0 -4" radius-inner="1.8" radius-outer="2.0" material="color: #F0F3FA; transparent: true; opacity: 0.4"></a-ring>
 				<a-ring position="0 0  0" radius-inner="1.8" radius-outer="2.0" material="color: #F0F3FA; transparent: true; opacity: 0.6"></a-ring>
 
-				<!-- ★修正: from: 0 -1.0 -12 (奥の低め) から to: 0 3.5 5 (手前の上空、頭上) へ飛行させて頭上を通過させる -->
-				<a-entity id="massive-plane" position="0 -1.0 -12" rotation="10 180 0" scale="0.08 0.08 0.08">
+				<!-- ★修正: 奥深く(-15)から頭上へ、easeInCubic で遠くから迫るアニメーションを復元 -->
+				<a-entity id="massive-plane" position="0 -1.0 -15" rotation="10 180 0" scale="0.05 0.05 0.05">
 					<a-cone radius-bottom="0.25" radius-top="0" height="0.8" rotation="-90 0 0" position="0 0 -1.2" color="#ffffff" material="metalness: 0.4"></a-cone>
 					<a-cylinder radius="0.25" height="2.0" rotation="90 0 0" position="0 0 0" color="#ffffff" material="metalness: 0.4"></a-cylinder>
 					<a-cone radius-bottom="0" radius-top="0.25" height="1.0" rotation="-90 0 0" position="0 0 1.5" color="#ffffff" material="metalness: 0.4"></a-cone>
@@ -184,13 +183,12 @@
 			</a-entity>
 
 			<!-- ========================================================
-			     ★第2.8ステージ：3Dホテル＆飛び込み演出（距離・サイズ・窓消灯調整版）
+			     ★第2.8ステージ：3Dホテル＆飛び込み演出
 			     ======================================================== -->
-			<!-- ★修正: position="0 -0.8 -6" で少し後ろに下げ、全体が見えるように配置 -->
 			<a-entity id="hotel-stage" visible="false" position="0 -0.8 -6" scale="0 0 0">
-				<!-- ホテル本体 -->
+				<!-- ホテル本体（★修正：wireframeの斜線を削除） -->
 				<a-box width="2" height="3" depth="0.8" color="#224571" material="metalness: 0.5"></a-box>
-				<a-box width="2.02" height="3.02" depth="0.82" material="color: #ffffff; wireframe: true; opacity: 0.6; transparent: true"></a-box>
+				
 				<a-cylinder radius="0.1" height="0.5" position="0 1.75 0" color="#ffffff"></a-cylinder>
 
 				<!-- 客室の窓（消灯時は濃い紺色で真っ暗、点灯時に発光） -->
@@ -210,9 +208,9 @@
 				<a-plane class="hotel-window" position="0 0.1 0.41" width="0.4" height="0.4" color="#F0F3FA" material="opacity: 0; transparent: true; shader: flat;"></a-plane>
 				<a-plane class="hotel-window" position="0.6 0.1 0.41" width="0.4" height="0.4" color="#F0F3FA" material="opacity: 0; transparent: true; shader: flat;"></a-plane>
 
-				<!-- 1F エントランス -->
+				<!-- 1F エントランス（★修正：wireframeの斜線を削除し、白い背景を敷いて縁取りを表現） -->
+				<a-box position="0 -1.0 0.38" width="1.05" height="1.05" depth="0.05" color="#ffffff"></a-box>
 				<a-box position="0 -1.0 0.4" width="1.0" height="1.0" depth="0.05" color="#05101a"></a-box>
-				<a-box position="0 -1.0 0.4" width="1.02" height="1.02" depth="0.06" material="color: #ffffff; wireframe: true; opacity: 0.8; transparent: true"></a-box>
 				
 				<!-- 扉（左右にスライドして開く） -->
 				<a-plane id="door-left" position="-0.25 -1.0 0.44" width="0.48" height="0.96" color="#224571" material="metalness: 0.2">
@@ -317,9 +315,9 @@
 					popoutLoader.classList.remove("is-active");
 					flybyStage.setAttribute("visible", "true");
 					
-					// ★修正: 飛行機が奥(-12の低め)から手前上空(+3.5の高さ)へ飛び越える軌道に設定
-					massivePlane.setAttribute("animation__fly", "property: position; from: 0 -1.0 -12; to: 0 3.5 5; dur: 2200; easing: easeOutQuad;");
-					massivePlane.setAttribute("animation__scale", "property: scale; from: 0.08 0.08 0.08; to: 2.2 2.2 2.2; dur: 2200; easing: easeOutQuad;");
+					// ★修正: easeInCubic で遠く（Z=-15）から一気に迫るアニメーションを復元
+					massivePlane.setAttribute("animation__fly", "property: position; from: 0 -1.0 -15; to: 0 3.5 5; dur: 2200; easing: easeInCubic;");
+					massivePlane.setAttribute("animation__scale", "property: scale; from: 0.05 0.05 0.05; to: 2.2 2.2 2.2; dur: 2200; easing: easeInCubic;");
 
 					// 3. ジェット機通過時（2.2秒後）フラッシュと同時にキャリーケース移動開始
 					flybyTimeout = setTimeout(() => {
@@ -344,7 +342,7 @@
 							massiveSuitcase.removeAttribute("animation__move");
 							massiveSuitcase.removeAttribute("animation__rotate");
 
-							// 3Dホテル出現（サイズを1.0にし、全景が把握しやすく調整）
+							// 3Dホテル出現
 							hotelStage.setAttribute("visible", "true");
 							hotelStage.setAttribute("animation__pop", "property: scale; from: 0 0 0; to: 1.0 1.0 1.0; dur: 800; easing: easeOutElastic;");
 
@@ -362,10 +360,9 @@
 							}, 2000);
 
 							// ホテルの扉へカメラが飛び込む（2600ms時点）
-							// ★修正: 1階の扉（Y = -1.0付近）に向かってダイレクトにズームインするように調整
 							setTimeout(() => {
-								hotelStage.setAttribute("animation__dive", "property: position; to: 0 -1.0 4; dur: 800; easing: easeInCubic;");
-								hotelStage.setAttribute("animation__dive_scale", "property: scale; to: 8 8 8; dur: 800; easing: easeInCubic;");
+								hotelStage.setAttribute("animation__dive", "property: position; to: 0 10.0 4; dur: 800; easing: easeInCubic;");
+								hotelStage.setAttribute("animation__dive_scale", "property: scale; to: 10 10 10; dur: 800; easing: easeInCubic;");
 							}, 2600);
 
 							// 5. 飛び込み完了後（3400ms時点）、地球儀表示へ
@@ -418,8 +415,9 @@
 				flybyStage.setAttribute("visible", "false");
 				massivePlane.removeAttribute("animation__fly");
 				massivePlane.removeAttribute("animation__scale");
-				massivePlane.setAttribute("position", "0 -1.0 -12");
-				massivePlane.setAttribute("scale", "0.08 0.08 0.08");
+				// ★修正: リセット座標も -15 に合わせる
+				massivePlane.setAttribute("position", "0 -1.0 -15");
+				massivePlane.setAttribute("scale", "0.05 0.05 0.05");
 
 				suitcaseStage.setAttribute("visible", "false");
 				massiveSuitcase.removeAttribute("animation__move");
