@@ -169,6 +169,33 @@
 			</a-entity>
 
 			<!-- ========================================================
+			     ★追加：巨大キャリーケースの横移動（第2.5ステージ）
+			     ======================================================== -->
+			<a-entity id="suitcase-stage" visible="false">
+				<!-- キャリーケース本体：右から左へ画面の大部分を埋めるサイズで移動 -->
+				<a-entity id="massive-suitcase" position="8 0 2" scale="2.5 2.5 2.5">
+					<!-- ボディ（ネイビー） -->
+					<a-box width="1.0" height="1.4" depth="0.6" color="#224571" material="metalness: 0.5; roughness: 0.4"></a-box>
+					<!-- ボディの縁取り・凹凸ライン（ホワイト） -->
+					<a-box width="1.02" height="1.42" depth="0.62" material="color: #ffffff; wireframe: true; transparent: true; opacity: 0.8"></a-box>
+					<a-box position="0 0 0" width="1.05" height="0.1" depth="0.65" color="#ffffff" material="opacity: 0.9"></a-box>
+					<a-box position="0 0.4 0" width="1.05" height="0.05" depth="0.65" color="#ffffff" material="opacity: 0.9"></a-box>
+					<a-box position="0 -0.4 0" width="1.05" height="0.05" depth="0.65" color="#ffffff" material="opacity: 0.9"></a-box>
+					
+					<!-- 持ち手（上部ハンドル） -->
+					<a-box position="0 0.8 0" width="0.4" height="0.2" depth="0.05" color="#ffffff"></a-box>
+					<a-box position="-0.15 0.7 0" width="0.05" height="0.2" depth="0.05" color="#ffffff"></a-box>
+					<a-box position="0.15 0.7 0" width="0.05" height="0.2" depth="0.05" color="#ffffff"></a-box>
+					
+					<!-- キャスター（車輪） -->
+					<a-cylinder position="-0.35 -0.75 0.15" radius="0.1" height="0.1" rotation="0 0 90" color="#ffffff"></a-cylinder>
+					<a-cylinder position="0.35 -0.75 0.15" radius="0.1" height="0.1" rotation="0 0 90" color="#ffffff"></a-cylinder>
+					<a-cylinder position="-0.35 -0.75 -0.15" radius="0.1" height="0.1" rotation="0 0 90" color="#ffffff"></a-cylinder>
+					<a-cylinder position="0.35 -0.75 -0.15" radius="0.1" height="0.1" rotation="0 0 90" color="#ffffff"></a-cylinder>
+				</a-entity>
+			</a-entity>
+
+			<!-- ========================================================
 			     第3ステージ：地球儀 ＆ 3機旋回グループ（ユーザー提示の元コードを完全復元）
 			     ======================================================== -->
 			<a-entity id="hologram-group" position="0 -0.15 0" scale="0 0 0" 
@@ -232,12 +259,16 @@
 			const massivePlane = document.getElementById("massive-plane");
 			const flashOverlay = document.getElementById("flash-overlay");
 			
+			const suitcaseStage = document.getElementById("suitcase-stage");
+			const massiveSuitcase = document.getElementById("massive-suitcase");
+
 			const hologramGroup = document.querySelector("#hologram-group");
 			const hologramLogo = document.getElementById("hologram-logo");
 
 			let loadTimeout = null;
 			let flybyTimeout = null;
 			let flashTimeout = null;
+			let suitcaseTimeout = null;
 			let logoTimeout = null;
 
 			// マーカー認識時
@@ -255,7 +286,7 @@
 					massivePlane.setAttribute("animation__fly", "property: position; from: 0 -0.5 -15; to: 0 2.5 3; dur: 2200; easing: easeInCubic;");
 					massivePlane.setAttribute("animation__scale", "property: scale; from: 0.1 0.1 0.1; to: 2.5 2.5 2.5; dur: 2200; easing: easeInCubic;");
 
-					// 3. ジェット機がカメラを通過する瞬間（約2.2秒後）に画面をフラッシュさせ、地球儀を出す
+					// 3. ジェット機がカメラを通過する瞬間（約2.2秒後）に画面をフラッシュさせ、キャリーケースを横切らせる
 					flybyTimeout = setTimeout(() => {
 						// 画面フラッシュ演出
 						flashOverlay.classList.add("is-flashing");
@@ -269,13 +300,26 @@
 						massivePlane.removeAttribute("animation__fly");
 						massivePlane.removeAttribute("animation__scale");
 
-						// 4. 地球儀（hologram-group）をポップアップ表示
-						hologramGroup.emit("popup");
+						// キャリーケースを表示して横移動開始 (2.5秒間)
+						suitcaseStage.setAttribute("visible", "true");
+						massiveSuitcase.setAttribute("animation__move", "property: position; from: 8 0 2; to: -8 0 2; dur: 2500; easing: easeInOutSine;");
+						massiveSuitcase.setAttribute("animation__rotate", "property: rotation; from: 10 -30 10; to: -10 30 -10; dur: 2500; easing: linear;");
 
-						// 5. 3秒間地球儀を見せたあと、ロゴアニメーションを発火
-						logoTimeout = setTimeout(() => {
-							hologramLogo.classList.add("is-playing");
-						}, 3000);
+						suitcaseTimeout = setTimeout(() => {
+							// キャリーケースを隠す
+							suitcaseStage.setAttribute("visible", "false");
+							massiveSuitcase.removeAttribute("animation__move");
+							massiveSuitcase.removeAttribute("animation__rotate");
+
+							// 4. 地球儀（hologram-group）をポップアップ表示
+							hologramGroup.emit("popup");
+
+							// 5. 3秒間地球儀を見せたあと、ロゴアニメーションを発火
+							logoTimeout = setTimeout(() => {
+								hologramLogo.classList.add("is-playing");
+							}, 3000);
+
+						}, 2500);
 
 					}, 2200);
 
@@ -287,6 +331,7 @@
 				clearTimeout(loadTimeout);
 				clearTimeout(flybyTimeout);
 				clearTimeout(flashTimeout);
+				clearTimeout(suitcaseTimeout);
 				clearTimeout(logoTimeout);
 
 				popoutLoader.classList.remove("is-active");
@@ -297,6 +342,10 @@
 				massivePlane.removeAttribute("animation__scale");
 				massivePlane.setAttribute("position", "0 -1.0 -15");
 				massivePlane.setAttribute("scale", "0.1 0.1 0.1");
+
+				suitcaseStage.setAttribute("visible", "false");
+				massiveSuitcase.removeAttribute("animation__move");
+				massiveSuitcase.removeAttribute("animation__rotate");
 
 				hologramGroup.setAttribute("scale", "0 0 0");
 				hologramLogo.classList.remove("is-playing");
